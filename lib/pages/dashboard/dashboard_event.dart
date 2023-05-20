@@ -14,21 +14,3 @@ final class SaveCategoriesEvent extends DashboardEvent {
   @override
   String toString() => 'SaveCategoriesEvent(groups: $groups)';
 }
-
-class SaveCategoryGroup {
-  SaveCategoryGroup(this.id, this.name, this.deleted, this.categories);
-
-  final int? id;
-  final String name;
-  final bool deleted;
-  final List<SaveCategory> categories;
-}
-
-class SaveCategory {
-  SaveCategory(this.id, this.name, this.deleted, this.budget);
-
-  final int? id;
-  final String name;
-  final bool deleted;
-  final double budget;
-}

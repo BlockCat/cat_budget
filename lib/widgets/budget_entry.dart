@@ -2,8 +2,10 @@ import 'package:cat_budget/models/category.dart';
 import 'package:flutter/widgets.dart';
 
 class BudgetEntry extends StatelessWidget {
-  const BudgetEntry({super.key, required this.category});
 
+  const BudgetEntry({super.key, this.moneyUsed, required this.category});
+
+  final double? moneyUsed;
   final Category category;
 
   @override
@@ -13,8 +15,8 @@ class BudgetEntry extends StatelessWidget {
         Column(
           children: [
             Text(category.name),
-            Text('Total ${category.total}/${category.budget}'),            
-          ],          
+            Text('Total ${moneyUsed}/${category.budget}'),
+          ],
         )
       ],
     );
