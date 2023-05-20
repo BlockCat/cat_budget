@@ -1,15 +1,16 @@
-import 'package:cat_budget/cubit/category_cubit.dart';
 import 'package:cat_budget/widgets/budget_entry.dart';
 import 'package:cat_budget/widgets/expandable_group.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
+import '../bloc/category/category_bloc.dart';
 
 class BudgetList extends StatelessWidget {
   const BudgetList({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<CategoryCubit, CategoryState>(builder: (context, state) {
+    return BlocBuilder<CategoryBloc, CategoryState>(builder: (context, state) {
       return ListView.builder(
         itemCount: state.groups.length,
         itemBuilder: (context, index) {

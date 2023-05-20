@@ -1,4 +1,4 @@
-import 'package:cat_budget/pages/counter_page.dart';
+import 'package:cat_budget/pages/home.dart';
 import 'package:flutter/material.dart';
 
 Future<void> main() async {
@@ -20,7 +20,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const CounterPage(),
+      home: const HomePage(),
     );
   }
 }

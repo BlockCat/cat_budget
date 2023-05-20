@@ -13,8 +13,8 @@ class BudgetEntry extends StatelessWidget {
         Column(
           children: [
             Text(category.name),
-            Text('Total ${category.total}/${category.budget}')
-          ],
+            Text('Total ${category.total}/${category.budget}'),            
+          ],          
         )
       ],
     );
