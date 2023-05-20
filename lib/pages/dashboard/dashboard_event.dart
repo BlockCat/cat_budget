@@ -1,15 +1,15 @@
-part of 'category_bloc.dart';
+part of 'dashboard_bloc.dart';
 
 @immutable
-sealed class CategoryEvent {
-  const CategoryEvent();
+sealed class DashboardEvent {
+  const DashboardEvent();
 }
 
 @immutable
-final class SaveCategoriesEvent extends CategoryEvent {
+final class SaveCategoriesEvent extends DashboardEvent {
   SaveCategoriesEvent(this.groups);
 
-  final List<SaveCategoryGroup> groups;
+  final List<CategoryGroup> groups;
 
   @override
   String toString() => 'SaveCategoriesEvent(groups: $groups)';

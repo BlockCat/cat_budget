@@ -1,5 +1,4 @@
-import 'package:cat_budget/bloc/category/category_bloc.dart';
-import 'package:cat_budget/widgets/budget_list.dart';
+import 'package:cat_budget/pages/dashboard/dashboard_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -8,7 +7,7 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(create: (_) => CategoryBloc(), child: _HomePage());
+    return BlocProvider(create: (_) => DashboardBloc(), child: _HomePage());
   }
 }
 
@@ -23,6 +22,6 @@ class _HomePage extends StatelessWidget {
           ),
         ),
         appBar: AppBar(title: const Text('CatBudget')),
-        body: const BudgetList());
+        body: Text('Hello World'));
   }
 }

@@ -1,0 +1,36 @@
+model CategoryGroup {
+    id         Int @id @default(@autoincrement())
+    name       String     @unique
+    sort       Int
+    categories Category[] @relation("categoryGroup")
+}
+
+model Category {
+    id Int @id @default(@autoincrement())
+    name            String        @unique
+    categoryGroupId Int
+    sort            Int
+    categoryGroup   CategoryGroup @relation("categoryGroup", fields: ["categoryGroupId"], references: ["id"])
+    transactions    Transaction[]
+}
+
+model Transaction {
+    id Int @id @default(@autoincrement())
+    category   Category @relation("category", fields: ["categoryId"], references: ["id"])
+    categoryId Int
+    accountId  Int
+    account    Account  @relation("account", fields: ["accountId"], references: ["id"])
+    amount     Float
+    date       DateTime
+    note       String?
+    tags       String[]
+    createdAt  DateTime @default(now())
+}
+
+model Account {
+    id Int @id @default(@autoincrement())
+    name         String
+    transactions Transaction[] @relation("account")
+    last_sync    DateTime?
+    balance      Float
+}
