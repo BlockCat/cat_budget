@@ -7,7 +7,7 @@ sealed class DashboardEvent {
 
 @immutable
 final class SaveCategoriesEvent extends DashboardEvent {
-  SaveCategoriesEvent(this.groups);
+  const SaveCategoriesEvent(this.groups);
 
   final List<CategoryGroup> groups;
 

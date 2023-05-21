@@ -1,12 +1,17 @@
+import 'package:cat_budget/models/category.dart';
+
 class CategoryGroup {
   final int? id;
   final String name;
   final int sort;
 
+  final List<Category> categories;
+
   const CategoryGroup({
     this.id,
     required this.name,
     required this.sort,
+    this.categories = const [],
   });
 
   @override
