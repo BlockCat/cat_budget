@@ -7,10 +7,31 @@ sealed class DashboardEvent {
 
 @immutable
 final class SaveCategoriesEvent extends DashboardEvent {
-  const SaveCategoriesEvent(this.groups);
+  const SaveCategoriesEvent(this.categories);
 
-  final List<CategoryGroup> groups;
+  final List<Category> categories;
 
   @override
-  String toString() => 'SaveCategoriesEvent(groups: $groups)';
+  String toString() => 'SaveCategoriesEvent(groups: $categories)';
+}
+
+@immutable
+final class LoadStateEvent extends DashboardEvent {
+  final int year;
+  final int month;
+
+  const LoadStateEvent(this.year, this.month);
+
+  @override
+  String toString() => 'LoadStateEvent(year: $year, month: $month)';
+}
+
+@immutable
+final class AddTransactionEvent extends DashboardEvent {
+  const AddTransactionEvent(this.transaction);
+
+  final BankTransaction transaction;
+
+  @override
+  String toString() => 'AddTransactionEvent(transaction: $transaction)';
 }

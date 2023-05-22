@@ -1,12 +1,23 @@
 part of 'dashboard_bloc.dart';
 
 class DashboardState {
-  
-  final List<CategoryGroup> groups;
+  final double moneyToAllocate;
+  final double moneyIncome;
+  final double moneyExpenses;
+  final List<Category> categories;
 
-  const DashboardState({this.groups = const []});
+  const DashboardState(
+      {required this.moneyToAllocate,
+      required this.moneyIncome,
+      required this.moneyExpenses,
+      required this.categories});
 }
 
 class DashboardStateInitial extends DashboardState {
-  DashboardStateInitial() : super(groups: []);
+  DashboardStateInitial()
+      : super(
+            categories: [],
+            moneyToAllocate: 0,
+            moneyIncome: 0,
+            moneyExpenses: 0);
 }

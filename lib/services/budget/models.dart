@@ -10,54 +10,51 @@
 /// Budgets are the top level of the budgeting system. They are the highest level
 /// of organization and are used to group budget categories together.
 class Budget {
-  /// The unique identifier for the budget.
-  final int id;
-
-  /// The name of the budget.
+  final int? id;
   final String name;
-
-  /// The description of the budget.
   final String? description;
 
-  /// The date the budget was created.
-  /// The list of categories for the budget.
-  final List<Category> categories;
-
-  /// The list of accounts for the budget.
-  final List<Account> accounts;
+  Budget(this.id, this.name, this.description);
 }
 
 class BankTransaction {
-  final int id;
-  final Category? category;
+  final int? id;
+  final int accountId;
+  final int? categoryId;
   final DateTime date;
   final String description;
   final double amount;
+
+  BankTransaction(this.id, this.accountId, this.categoryId, this.date,
+      this.description, this.amount);
 }
 
 class CategoryEnvelope {
-  final int id;
-  final Category category;
-  final double amount;
+  final int? id;
+  final int categoryId;
+  final double amountPutIn;
   final double balance;
+
+  final int month;
+  final int year;
+
+  CategoryEnvelope(this.id, this.categoryId, this.year, this.month,
+      this.amountPutIn, this.balance);
 }
 
-class Account {
-  final int id;
+class MoneyAccount {
+  final int? id;
   final String name;
   final String description;
   final double balance;
-  final List<BankTransaction> transactions;
 
-  Account(
-      this.id, this.name, this.description, this.balance, this.transactions);
+  MoneyAccount(this.id, this.name, this.description, this.balance);
 }
 
 class Category {
-  final int id;
+  final int? id;
   final String name;
   final String description;
-  final List<CategoryEnvelope> envelopes;
 
-  Category(this.id, this.name, this.description, this.envelopes);
+  Category(this.id, this.name, this.description);
 }
