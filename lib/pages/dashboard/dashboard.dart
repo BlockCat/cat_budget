@@ -22,6 +22,6 @@ class _HomePage extends StatelessWidget {
           ),
         ),
         appBar: AppBar(title: const Text('CatBudget')),
-        body: Text('Hello World'));
+        body: const Text('Hello World'));
   }
 }
