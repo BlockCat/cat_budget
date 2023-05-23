@@ -8,6 +8,12 @@ A new Flutter project.
 flutter run -t /widgetbook/main.widgetbook.dart
 ```
 
+## Run build files
+
+```bash	
+flutter pub run build_runner build
+```
+
 ## Getting Started
 
 This project is a starting point for a Flutter application.
@@ -71,6 +77,8 @@ erDiagram
     }
 
     Account {
+        string name
+        string description
         number balance
         AccountType type
     }
@@ -82,6 +90,8 @@ erDiagram
 
     Envelope {
         number balance
+        number want
+        number assigned
         int year
         int month
     }
@@ -89,4 +99,5 @@ erDiagram
     Category {
         string name
     }
+
 ```
