@@ -17,3 +17,9 @@ class MainDatabase extends _$MainDatabase {
   @override
   int get schemaVersion => 1;
 }
+
+enum CheckingsType {
+  checkings,
+  savings,
+  other
+}

@@ -29,9 +29,9 @@ class Accounts extends Table with TableInfo<Accounts, Account> {
       requiredDuringInsert: false,
       $customConstraints: '');
   static const VerificationMeta _typeMeta = const VerificationMeta('type');
-  late final GeneratedColumn<String> type = GeneratedColumn<String>(
+  late final GeneratedColumn<int> type = GeneratedColumn<int>(
       'type', aliasedName, false,
-      type: DriftSqlType.string,
+      type: DriftSqlType.int,
       requiredDuringInsert: true,
       $customConstraints: 'NOT NULL');
   static const VerificationMeta _balanceMeta =
@@ -94,7 +94,7 @@ class Accounts extends Table with TableInfo<Accounts, Account> {
       description: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}description']),
       type: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}type'])!,
+          .read(DriftSqlType.int, data['${effectivePrefix}type'])!,
       balance: attachedDatabase.typeMapping
           .read(DriftSqlType.double, data['${effectivePrefix}balance'])!,
     );
@@ -113,7 +113,7 @@ class Account extends DataClass implements Insertable<Account> {
   final int id;
   final String name;
   final String? description;
-  final String type;
+  final int type;
   final double balance;
   const Account(
       {required this.id,
@@ -129,7 +129,7 @@ class Account extends DataClass implements Insertable<Account> {
     if (!nullToAbsent || description != null) {
       map['description'] = Variable<String>(description);
     }
-    map['type'] = Variable<String>(type);
+    map['type'] = Variable<int>(type);
     map['balance'] = Variable<double>(balance);
     return map;
   }
@@ -153,7 +153,7 @@ class Account extends DataClass implements Insertable<Account> {
       id: serializer.fromJson<int>(json['id']),
       name: serializer.fromJson<String>(json['name']),
       description: serializer.fromJson<String?>(json['description']),
-      type: serializer.fromJson<String>(json['type']),
+      type: serializer.fromJson<int>(json['type']),
       balance: serializer.fromJson<double>(json['balance']),
     );
   }
@@ -164,7 +164,7 @@ class Account extends DataClass implements Insertable<Account> {
       'id': serializer.toJson<int>(id),
       'name': serializer.toJson<String>(name),
       'description': serializer.toJson<String?>(description),
-      'type': serializer.toJson<String>(type),
+      'type': serializer.toJson<int>(type),
       'balance': serializer.toJson<double>(balance),
     };
   }
@@ -173,7 +173,7 @@ class Account extends DataClass implements Insertable<Account> {
           {int? id,
           String? name,
           Value<String?> description = const Value.absent(),
-          String? type,
+          int? type,
           double? balance}) =>
       Account(
         id: id ?? this.id,
@@ -211,7 +211,7 @@ class AccountsCompanion extends UpdateCompanion<Account> {
   final Value<int> id;
   final Value<String> name;
   final Value<String?> description;
-  final Value<String> type;
+  final Value<int> type;
   final Value<double> balance;
   const AccountsCompanion({
     this.id = const Value.absent(),
@@ -224,7 +224,7 @@ class AccountsCompanion extends UpdateCompanion<Account> {
     this.id = const Value.absent(),
     required String name,
     this.description = const Value.absent(),
-    required String type,
+    required int type,
     this.balance = const Value.absent(),
   })  : name = Value(name),
         type = Value(type);
@@ -232,7 +232,7 @@ class AccountsCompanion extends UpdateCompanion<Account> {
     Expression<int>? id,
     Expression<String>? name,
     Expression<String>? description,
-    Expression<String>? type,
+    Expression<int>? type,
     Expression<double>? balance,
   }) {
     return RawValuesInsertable({
@@ -248,7 +248,7 @@ class AccountsCompanion extends UpdateCompanion<Account> {
       {Value<int>? id,
       Value<String>? name,
       Value<String?>? description,
-      Value<String>? type,
+      Value<int>? type,
       Value<double>? balance}) {
     return AccountsCompanion(
       id: id ?? this.id,
@@ -272,7 +272,7 @@ class AccountsCompanion extends UpdateCompanion<Account> {
       map['description'] = Variable<String>(description.value);
     }
     if (type.present) {
-      map['type'] = Variable<String>(type.value);
+      map['type'] = Variable<int>(type.value);
     }
     if (balance.present) {
       map['balance'] = Variable<double>(balance.value);
@@ -1377,16 +1377,16 @@ abstract class _$MainDatabase extends GeneratedDatabase {
       'CREATE TRIGGER IF NOT EXISTS category_envelope_updated AFTER UPDATE ON category_envelopes WHEN OLD.budget <> NEW.budget BEGIN UPDATE category_envelopes SET balance = balance - OLD.budget + NEW.budget WHERE id = NEW.id;END',
       'category_envelope_updated');
   late final Trigger categoryEnvelopeBalanceUpdated = Trigger(
-      'CREATE TRIGGER IF NOT EXISTS category_envelope_balance_updated AFTER UPDATE ON category_envelopes WHEN OLD.balance <> NEW.balance BEGIN UPDATE category_envelopes SET balance = balance - OLD.balance + NEW.balance WHERE category_id = NEW.category_id AND period > NEW.period;END',
+      'CREATE TRIGGER IF NOT EXISTS category_envelope_balance_updated AFTER UPDATE ON category_envelopes WHEN OLD.balance <> NEW.balance BEGIN UPDATE category_envelopes SET balance = balance + max(NEW.balance - OLD.balance, -OLD.balance) WHERE category_id = NEW.category_id AND period > NEW.period;END',
       'category_envelope_balance_updated');
   late final Trigger bankTransactionCategoryInserted = Trigger(
-      'CREATE TRIGGER IF NOT EXISTS bank_transaction_category_inserted AFTER INSERT ON bank_transaction_category BEGIN UPDATE category_envelopes SET balance = balance + NEW.amount WHERE category_id = NEW.category_id AND strftime(\'%Y-%m\', period) = strftime(\'%Y-%m\', (SELECT date FROM bank_transactions WHERE bank_transactions.id = bank_transaction_id));END',
+      'CREATE TRIGGER IF NOT EXISTS bank_transaction_category_inserted AFTER INSERT ON bank_transaction_category BEGIN UPDATE category_envelopes SET balance = balance + NEW.amount WHERE category_id = NEW.category_id AND strftime(\'%Y-%m\', period, \'auto\') = (SELECT strftime(\'%Y-%m\', date, \'auto\') FROM bank_transactions AS bs WHERE bs.id = NEW.bank_transaction_id);END',
       'bank_transaction_category_inserted');
   late final Trigger bankTransactionCategoryUpdated = Trigger(
-      'CREATE TRIGGER IF NOT EXISTS bank_transaction_category_updated AFTER UPDATE ON bank_transaction_category WHEN OLD.amount <> NEW.amount BEGIN UPDATE category_envelopes SET balance = balance - OLD.amount + NEW.amount WHERE category_id = NEW.category_id AND strftime(\'%Y-%m\', period) = strftime(\'%Y-%m\', (SELECT date FROM bank_transactions WHERE bank_transactions.id = bank_transaction_id));END',
+      'CREATE TRIGGER IF NOT EXISTS bank_transaction_category_updated AFTER UPDATE ON bank_transaction_category WHEN OLD.amount <> NEW.amount BEGIN UPDATE category_envelopes SET balance = balance - OLD.amount WHERE category_id = OLD.category_id AND strftime(\'%Y-%m\', period) = strftime(\'%Y-%m\', (SELECT date FROM bank_transactions WHERE bank_transactions.id = OLD.bank_transaction_id));UPDATE category_envelopes SET balance = balance + NEW.amount WHERE category_id = NEW.category_id AND strftime(\'%Y-%m\', period) = strftime(\'%Y-%m\', (SELECT date FROM bank_transactions WHERE bank_transactions.id = NEW.bank_transaction_id));END',
       'bank_transaction_category_updated');
   late final Trigger bankTransactionCategoryDeleted = Trigger(
-      'CREATE TRIGGER IF NOT EXISTS bank_transaction_category_deleted AFTER DELETE ON bank_transaction_category BEGIN UPDATE category_envelopes SET balance = balance - OLD.amount WHERE category_id = OLD.category_id AND strftime(\'%Y-%m\', period) = strftime(\'%Y-%m\', (SELECT date FROM bank_transactions WHERE bank_transactions.id = bank_transaction_id));END',
+      'CREATE TRIGGER IF NOT EXISTS bank_transaction_category_deleted AFTER DELETE ON bank_transaction_category BEGIN UPDATE category_envelopes SET balance = balance - OLD.amount WHERE category_id = OLD.category_id AND strftime(\'%Y-%m\', period) = strftime(\'%Y-%m\', (SELECT date FROM bank_transactions WHERE id = OLD.bank_transaction_id));END',
       'bank_transaction_category_deleted');
   late final Trigger transactionAddedUpdateAccount = Trigger(
       'CREATE TRIGGER IF NOT EXISTS transaction_added_update_account AFTER INSERT ON bank_transactions BEGIN UPDATE accounts SET balance = balance + NEW.amount WHERE id = NEW.account_id;END',

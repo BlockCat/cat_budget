@@ -2,7 +2,7 @@ CREATE TABLE accounts(
   id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
   name TEXT UNIQUE NOT NULL,
   description TEXT,
-  type TEXT NOT NULL,
+  type INTEGER NOT NULL,
   balance REAL NOT NULL DEFAULT 0
 );
 
@@ -15,7 +15,7 @@ CREATE TABLE categories(
 CREATE TABLE category_envelopes(
   id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
   category_id INTEGER NOT NULL,
-  period DATE NOT NULL,
+  period DATETIME  NOT NULL,
   budget REAL NOT NULL,
   balance REAL NOT NULL DEFAULT 0,
   FOREIGN KEY(category_id) REFERENCES categories(id) ON DELETE CASCADE
@@ -25,7 +25,7 @@ CREATE TABLE bank_transactions (
   id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
   account_id INTEGER NOT NULL,
   amount REAL NOT NULL,
-  date DATE NOT NULL,
+  date DATETIME  NOT NULL,
   description TEXT,
   FOREIGN KEY(account_id) REFERENCES accounts(id) ON DELETE CASCADE
 );
@@ -56,7 +56,7 @@ CREATE TRIGGER IF NOT EXISTS category_envelope_balance_updated
   WHEN OLD.balance <> NEW.balance
 BEGIN
   UPDATE category_envelopes
-  SET balance = balance - OLD.balance + NEW.balance
+  SET balance = balance + max(NEW.balance - OLD.balance, -OLD.balance)
   WHERE category_id = NEW.category_id 
     AND period > NEW.period;
 END;
@@ -68,7 +68,7 @@ BEGIN
   UPDATE category_envelopes
   SET balance = balance + NEW.amount
   WHERE category_id = NEW.category_id
-  AND strftime('%Y-%m', period) = strftime('%Y-%m', (SELECT date FROM bank_transactions WHERE bank_transactions.id = bank_transaction_id));
+  AND strftime('%Y-%m', period, 'auto') = (SELECT strftime('%Y-%m', date, 'auto') FROM bank_transactions AS bs WHERE bs.id = NEW.bank_transaction_id);
 END;
 
 CREATE TRIGGER IF NOT EXISTS bank_transaction_category_updated
@@ -77,9 +77,13 @@ CREATE TRIGGER IF NOT EXISTS bank_transaction_category_updated
   WHEN OLD.amount <> NEW.amount
 BEGIN  
   UPDATE category_envelopes
-  SET balance = balance - OLD.amount + NEW.amount
+  SET balance = balance - OLD.amount
+  WHERE category_id = OLD.category_id
+  AND strftime('%Y-%m', period) = strftime('%Y-%m', (SELECT date FROM bank_transactions WHERE bank_transactions.id = OLD.bank_transaction_id));
+  UPDATE category_envelopes
+  SET balance = balance + NEW.amount
   WHERE category_id = NEW.category_id
-  AND strftime('%Y-%m', period) = strftime('%Y-%m', (SELECT date FROM bank_transactions WHERE bank_transactions.id = bank_transaction_id));
+  AND strftime('%Y-%m', period) = strftime('%Y-%m', (SELECT date FROM bank_transactions WHERE bank_transactions.id = NEW.bank_transaction_id));
 END;
 
 CREATE TRIGGER IF NOT EXISTS bank_transaction_category_deleted
@@ -89,7 +93,7 @@ BEGIN
   UPDATE category_envelopes
   SET balance = balance - OLD.amount
   WHERE category_id = OLD.category_id
-  AND strftime('%Y-%m', period) = strftime('%Y-%m', (SELECT date FROM bank_transactions WHERE bank_transactions.id = bank_transaction_id));
+  AND strftime('%Y-%m', period) = strftime('%Y-%m', (SELECT date FROM bank_transactions WHERE id = OLD.bank_transaction_id));
 END;
 
 
@@ -124,5 +128,6 @@ BEGIN
   SET balance = balance - OLD.amount
   WHERE id = OLD.account_id;
 END;
+
 
 moneyInBank: SELECT SUM(balance) FROM accounts;
