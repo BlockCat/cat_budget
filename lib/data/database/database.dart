@@ -18,8 +18,4 @@ class MainDatabase extends _$MainDatabase {
   int get schemaVersion => 1;
 }
 
-enum CheckingsType {
-  checkings,
-  savings,
-  other
-}
+enum CheckingsType { checkings, savings, other }

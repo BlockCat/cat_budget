@@ -1,8 +1,10 @@
-import 'package:cat_budget/pages/accounts/account.dart';
+import 'package:cat_budget/data/database/database.dart';
+import 'package:cat_budget/pages/accounts/account_page.dart';
 import 'package:cat_budget/pages/dashboard/dashboard.dart';
 import 'package:cat_budget/pages/transactions/transaction_page.dart';
 import 'package:cat_budget/services/budget/bottom_navbar.dart';
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
 
 final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
@@ -41,6 +43,8 @@ Future<void> main() async {
   // WidgetsFlutterBinding.ensureInitialized();
   // HydratedBloc.storage =
   //     await HydratedStorage.build(storageDirectory: 'hydrated_bloc');
+
+  GetIt.I.registerSingleton<MainDatabase>(MainDatabase());
 
   runApp(const MyApp());
 }
