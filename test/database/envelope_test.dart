@@ -25,26 +25,26 @@ void main() {
         CategoryEnvelopesCompanion.insert(
             categoryId: category1Id,
             period: DateTime.utc(2023, 10),
-            budget: 90,
-            balance: const Value(90)));
+            budget: 9000,
+            balance: const Value(9000)));
     category1Envelope2Id = await database.categoryEnvelopes.insertOne(
         CategoryEnvelopesCompanion.insert(
             categoryId: category1Id,
             period: DateTime.utc(2023, 11),
-            budget: 90,
-            balance: const Value(180.0)));
+            budget: 9000,
+            balance: const Value(18000)));
     category2Envelope1Id = await database.categoryEnvelopes.insertOne(
         CategoryEnvelopesCompanion.insert(
             categoryId: category2Id,
             period: DateTime.utc(2023, 10),
-            budget: 40,
-            balance: const Value(40.0)));
+            budget: 4000,
+            balance: const Value(4000)));
     category2Envelope2Id = await database.categoryEnvelopes.insertOne(
         CategoryEnvelopesCompanion.insert(
             categoryId: category2Id,
             period: DateTime.utc(2023, 11),
             budget: 0,
-            balance: const Value(40.0)));
+            balance: const Value(4000)));
   });
 
   tearDown(() async {

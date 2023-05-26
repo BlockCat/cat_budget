@@ -2,6 +2,8 @@
 import 'package:flutter/material.dart';
 
 class AddCustomAccountPage extends StatelessWidget {
+  const AddCustomAccountPage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -19,7 +21,7 @@ class AddAccountDetailForm extends StatefulWidget {
   const AddAccountDetailForm({Key? key}) : super(key: key);
 
   @override
-  _AddAccountDetailFormState createState() => _AddAccountDetailFormState();
+  State<AddAccountDetailForm> createState() => _AddAccountDetailFormState();
 }
 
 class _AddAccountDetailFormState extends State<AddAccountDetailForm> {

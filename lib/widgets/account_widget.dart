@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 
 class AccountEntryWidget extends StatelessWidget {
   const AccountEntryWidget(
@@ -12,18 +11,18 @@ class AccountEntryWidget extends StatelessWidget {
   final int id;
   final String name;
   final String? description;
-  final double money;
+  final int money;
 
   @override
   Widget build(BuildContext context) {
     final Color moneyColour;
 
     if (money < 0) {
-      moneyColour = Color.fromARGB(255, 255, 55, 68);
+      moneyColour = const Color.fromARGB(255, 255, 55, 68);
     } else if (money == 0) {
       moneyColour = const Color.fromARGB(255, 134, 134, 134);
     } else {
-      moneyColour = Color.fromARGB(255, 66, 196, 75);
+      moneyColour = const Color.fromARGB(255, 66, 196, 75);
     }
 
     return Card(
@@ -59,7 +58,7 @@ class AccountEntryWidget extends StatelessWidget {
                   child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text(money.toStringAsFixed(2),
+                        Text((money / 100.0).toStringAsFixed(2),
                             style: TextStyle(
                                 fontSize: 20,
                                 color: moneyColour,

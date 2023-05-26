@@ -36,9 +36,9 @@ class Accounts extends Table with TableInfo<Accounts, Account> {
       $customConstraints: 'NOT NULL');
   static const VerificationMeta _balanceMeta =
       const VerificationMeta('balance');
-  late final GeneratedColumn<double> balance = GeneratedColumn<double>(
+  late final GeneratedColumn<int> balance = GeneratedColumn<int>(
       'balance', aliasedName, false,
-      type: DriftSqlType.double,
+      type: DriftSqlType.int,
       requiredDuringInsert: false,
       $customConstraints: 'NOT NULL DEFAULT 0',
       defaultValue: const CustomExpression('0'));
@@ -96,7 +96,7 @@ class Accounts extends Table with TableInfo<Accounts, Account> {
       type: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}type'])!,
       balance: attachedDatabase.typeMapping
-          .read(DriftSqlType.double, data['${effectivePrefix}balance'])!,
+          .read(DriftSqlType.int, data['${effectivePrefix}balance'])!,
     );
   }
 
@@ -114,7 +114,7 @@ class Account extends DataClass implements Insertable<Account> {
   final String name;
   final String? description;
   final int type;
-  final double balance;
+  final int balance;
   const Account(
       {required this.id,
       required this.name,
@@ -130,7 +130,7 @@ class Account extends DataClass implements Insertable<Account> {
       map['description'] = Variable<String>(description);
     }
     map['type'] = Variable<int>(type);
-    map['balance'] = Variable<double>(balance);
+    map['balance'] = Variable<int>(balance);
     return map;
   }
 
@@ -154,7 +154,7 @@ class Account extends DataClass implements Insertable<Account> {
       name: serializer.fromJson<String>(json['name']),
       description: serializer.fromJson<String?>(json['description']),
       type: serializer.fromJson<int>(json['type']),
-      balance: serializer.fromJson<double>(json['balance']),
+      balance: serializer.fromJson<int>(json['balance']),
     );
   }
   @override
@@ -165,7 +165,7 @@ class Account extends DataClass implements Insertable<Account> {
       'name': serializer.toJson<String>(name),
       'description': serializer.toJson<String?>(description),
       'type': serializer.toJson<int>(type),
-      'balance': serializer.toJson<double>(balance),
+      'balance': serializer.toJson<int>(balance),
     };
   }
 
@@ -174,7 +174,7 @@ class Account extends DataClass implements Insertable<Account> {
           String? name,
           Value<String?> description = const Value.absent(),
           int? type,
-          double? balance}) =>
+          int? balance}) =>
       Account(
         id: id ?? this.id,
         name: name ?? this.name,
@@ -212,7 +212,7 @@ class AccountsCompanion extends UpdateCompanion<Account> {
   final Value<String> name;
   final Value<String?> description;
   final Value<int> type;
-  final Value<double> balance;
+  final Value<int> balance;
   const AccountsCompanion({
     this.id = const Value.absent(),
     this.name = const Value.absent(),
@@ -233,7 +233,7 @@ class AccountsCompanion extends UpdateCompanion<Account> {
     Expression<String>? name,
     Expression<String>? description,
     Expression<int>? type,
-    Expression<double>? balance,
+    Expression<int>? balance,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -249,7 +249,7 @@ class AccountsCompanion extends UpdateCompanion<Account> {
       Value<String>? name,
       Value<String?>? description,
       Value<int>? type,
-      Value<double>? balance}) {
+      Value<int>? balance}) {
     return AccountsCompanion(
       id: id ?? this.id,
       name: name ?? this.name,
@@ -275,7 +275,7 @@ class AccountsCompanion extends UpdateCompanion<Account> {
       map['type'] = Variable<int>(type.value);
     }
     if (balance.present) {
-      map['balance'] = Variable<double>(balance.value);
+      map['balance'] = Variable<int>(balance.value);
     }
     return map;
   }
@@ -541,9 +541,9 @@ class CategoryEnvelopes extends Table
       $customConstraints: 'NOT NULL');
   static const VerificationMeta _balanceMeta =
       const VerificationMeta('balance');
-  late final GeneratedColumn<double> balance = GeneratedColumn<double>(
+  late final GeneratedColumn<int> balance = GeneratedColumn<int>(
       'balance', aliasedName, false,
-      type: DriftSqlType.double,
+      type: DriftSqlType.int,
       requiredDuringInsert: false,
       $customConstraints: 'NOT NULL DEFAULT 0',
       defaultValue: const CustomExpression('0'));
@@ -604,7 +604,7 @@ class CategoryEnvelopes extends Table
       budget: attachedDatabase.typeMapping
           .read(DriftSqlType.double, data['${effectivePrefix}budget'])!,
       balance: attachedDatabase.typeMapping
-          .read(DriftSqlType.double, data['${effectivePrefix}balance'])!,
+          .read(DriftSqlType.int, data['${effectivePrefix}balance'])!,
     );
   }
 
@@ -627,7 +627,7 @@ class CategoryEnvelope extends DataClass
   final int categoryId;
   final DateTime period;
   final double budget;
-  final double balance;
+  final int balance;
   const CategoryEnvelope(
       {required this.id,
       required this.categoryId,
@@ -641,7 +641,7 @@ class CategoryEnvelope extends DataClass
     map['category_id'] = Variable<int>(categoryId);
     map['period'] = Variable<DateTime>(period);
     map['budget'] = Variable<double>(budget);
-    map['balance'] = Variable<double>(balance);
+    map['balance'] = Variable<int>(balance);
     return map;
   }
 
@@ -663,7 +663,7 @@ class CategoryEnvelope extends DataClass
       categoryId: serializer.fromJson<int>(json['category_id']),
       period: serializer.fromJson<DateTime>(json['period']),
       budget: serializer.fromJson<double>(json['budget']),
-      balance: serializer.fromJson<double>(json['balance']),
+      balance: serializer.fromJson<int>(json['balance']),
     );
   }
   @override
@@ -674,7 +674,7 @@ class CategoryEnvelope extends DataClass
       'category_id': serializer.toJson<int>(categoryId),
       'period': serializer.toJson<DateTime>(period),
       'budget': serializer.toJson<double>(budget),
-      'balance': serializer.toJson<double>(balance),
+      'balance': serializer.toJson<int>(balance),
     };
   }
 
@@ -683,7 +683,7 @@ class CategoryEnvelope extends DataClass
           int? categoryId,
           DateTime? period,
           double? budget,
-          double? balance}) =>
+          int? balance}) =>
       CategoryEnvelope(
         id: id ?? this.id,
         categoryId: categoryId ?? this.categoryId,
@@ -721,7 +721,7 @@ class CategoryEnvelopesCompanion extends UpdateCompanion<CategoryEnvelope> {
   final Value<int> categoryId;
   final Value<DateTime> period;
   final Value<double> budget;
-  final Value<double> balance;
+  final Value<int> balance;
   const CategoryEnvelopesCompanion({
     this.id = const Value.absent(),
     this.categoryId = const Value.absent(),
@@ -743,7 +743,7 @@ class CategoryEnvelopesCompanion extends UpdateCompanion<CategoryEnvelope> {
     Expression<int>? categoryId,
     Expression<DateTime>? period,
     Expression<double>? budget,
-    Expression<double>? balance,
+    Expression<int>? balance,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -759,7 +759,7 @@ class CategoryEnvelopesCompanion extends UpdateCompanion<CategoryEnvelope> {
       Value<int>? categoryId,
       Value<DateTime>? period,
       Value<double>? budget,
-      Value<double>? balance}) {
+      Value<int>? balance}) {
     return CategoryEnvelopesCompanion(
       id: id ?? this.id,
       categoryId: categoryId ?? this.categoryId,
@@ -785,7 +785,7 @@ class CategoryEnvelopesCompanion extends UpdateCompanion<CategoryEnvelope> {
       map['budget'] = Variable<double>(budget.value);
     }
     if (balance.present) {
-      map['balance'] = Variable<double>(balance.value);
+      map['balance'] = Variable<int>(balance.value);
     }
     return map;
   }
@@ -824,9 +824,9 @@ class BankTransactions extends Table
       requiredDuringInsert: true,
       $customConstraints: 'NOT NULL');
   static const VerificationMeta _amountMeta = const VerificationMeta('amount');
-  late final GeneratedColumn<double> amount = GeneratedColumn<double>(
+  late final GeneratedColumn<int> amount = GeneratedColumn<int>(
       'amount', aliasedName, false,
-      type: DriftSqlType.double,
+      type: DriftSqlType.int,
       requiredDuringInsert: true,
       $customConstraints: 'NOT NULL');
   static const VerificationMeta _dateMeta = const VerificationMeta('date');
@@ -895,7 +895,7 @@ class BankTransactions extends Table
       accountId: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}account_id'])!,
       amount: attachedDatabase.typeMapping
-          .read(DriftSqlType.double, data['${effectivePrefix}amount'])!,
+          .read(DriftSqlType.int, data['${effectivePrefix}amount'])!,
       date: attachedDatabase.typeMapping
           .read(DriftSqlType.dateTime, data['${effectivePrefix}date'])!,
       description: attachedDatabase.typeMapping
@@ -918,7 +918,7 @@ class BankTransactions extends Table
 class BankTransaction extends DataClass implements Insertable<BankTransaction> {
   final int id;
   final int accountId;
-  final double amount;
+  final int amount;
   final DateTime date;
   final String? description;
   const BankTransaction(
@@ -932,7 +932,7 @@ class BankTransaction extends DataClass implements Insertable<BankTransaction> {
     final map = <String, Expression>{};
     map['id'] = Variable<int>(id);
     map['account_id'] = Variable<int>(accountId);
-    map['amount'] = Variable<double>(amount);
+    map['amount'] = Variable<int>(amount);
     map['date'] = Variable<DateTime>(date);
     if (!nullToAbsent || description != null) {
       map['description'] = Variable<String>(description);
@@ -958,7 +958,7 @@ class BankTransaction extends DataClass implements Insertable<BankTransaction> {
     return BankTransaction(
       id: serializer.fromJson<int>(json['id']),
       accountId: serializer.fromJson<int>(json['account_id']),
-      amount: serializer.fromJson<double>(json['amount']),
+      amount: serializer.fromJson<int>(json['amount']),
       date: serializer.fromJson<DateTime>(json['date']),
       description: serializer.fromJson<String?>(json['description']),
     );
@@ -969,7 +969,7 @@ class BankTransaction extends DataClass implements Insertable<BankTransaction> {
     return <String, dynamic>{
       'id': serializer.toJson<int>(id),
       'account_id': serializer.toJson<int>(accountId),
-      'amount': serializer.toJson<double>(amount),
+      'amount': serializer.toJson<int>(amount),
       'date': serializer.toJson<DateTime>(date),
       'description': serializer.toJson<String?>(description),
     };
@@ -978,7 +978,7 @@ class BankTransaction extends DataClass implements Insertable<BankTransaction> {
   BankTransaction copyWith(
           {int? id,
           int? accountId,
-          double? amount,
+          int? amount,
           DateTime? date,
           Value<String?> description = const Value.absent()}) =>
       BankTransaction(
@@ -1016,7 +1016,7 @@ class BankTransaction extends DataClass implements Insertable<BankTransaction> {
 class BankTransactionsCompanion extends UpdateCompanion<BankTransaction> {
   final Value<int> id;
   final Value<int> accountId;
-  final Value<double> amount;
+  final Value<int> amount;
   final Value<DateTime> date;
   final Value<String?> description;
   const BankTransactionsCompanion({
@@ -1029,7 +1029,7 @@ class BankTransactionsCompanion extends UpdateCompanion<BankTransaction> {
   BankTransactionsCompanion.insert({
     this.id = const Value.absent(),
     required int accountId,
-    required double amount,
+    required int amount,
     required DateTime date,
     this.description = const Value.absent(),
   })  : accountId = Value(accountId),
@@ -1038,7 +1038,7 @@ class BankTransactionsCompanion extends UpdateCompanion<BankTransaction> {
   static Insertable<BankTransaction> custom({
     Expression<int>? id,
     Expression<int>? accountId,
-    Expression<double>? amount,
+    Expression<int>? amount,
     Expression<DateTime>? date,
     Expression<String>? description,
   }) {
@@ -1054,7 +1054,7 @@ class BankTransactionsCompanion extends UpdateCompanion<BankTransaction> {
   BankTransactionsCompanion copyWith(
       {Value<int>? id,
       Value<int>? accountId,
-      Value<double>? amount,
+      Value<int>? amount,
       Value<DateTime>? date,
       Value<String?>? description}) {
     return BankTransactionsCompanion(
@@ -1076,7 +1076,7 @@ class BankTransactionsCompanion extends UpdateCompanion<BankTransaction> {
       map['account_id'] = Variable<int>(accountId.value);
     }
     if (amount.present) {
-      map['amount'] = Variable<double>(amount.value);
+      map['amount'] = Variable<int>(amount.value);
     }
     if (date.present) {
       map['date'] = Variable<DateTime>(date.value);
@@ -1128,9 +1128,9 @@ class BankTransactionCategory extends Table
       requiredDuringInsert: true,
       $customConstraints: 'NOT NULL');
   static const VerificationMeta _amountMeta = const VerificationMeta('amount');
-  late final GeneratedColumn<double> amount = GeneratedColumn<double>(
+  late final GeneratedColumn<int> amount = GeneratedColumn<int>(
       'amount', aliasedName, false,
-      type: DriftSqlType.double,
+      type: DriftSqlType.int,
       requiredDuringInsert: true,
       $customConstraints: 'NOT NULL');
   @override
@@ -1188,7 +1188,7 @@ class BankTransactionCategory extends Table
       categoryId: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}category_id'])!,
       amount: attachedDatabase.typeMapping
-          .read(DriftSqlType.double, data['${effectivePrefix}amount'])!,
+          .read(DriftSqlType.int, data['${effectivePrefix}amount'])!,
     );
   }
 
@@ -1211,7 +1211,7 @@ class BankTransactionCategoryData extends DataClass
   final int id;
   final int bankTransactionId;
   final int categoryId;
-  final double amount;
+  final int amount;
   const BankTransactionCategoryData(
       {required this.id,
       required this.bankTransactionId,
@@ -1223,7 +1223,7 @@ class BankTransactionCategoryData extends DataClass
     map['id'] = Variable<int>(id);
     map['bank_transaction_id'] = Variable<int>(bankTransactionId);
     map['category_id'] = Variable<int>(categoryId);
-    map['amount'] = Variable<double>(amount);
+    map['amount'] = Variable<int>(amount);
     return map;
   }
 
@@ -1243,7 +1243,7 @@ class BankTransactionCategoryData extends DataClass
       id: serializer.fromJson<int>(json['id']),
       bankTransactionId: serializer.fromJson<int>(json['bank_transaction_id']),
       categoryId: serializer.fromJson<int>(json['category_id']),
-      amount: serializer.fromJson<double>(json['amount']),
+      amount: serializer.fromJson<int>(json['amount']),
     );
   }
   @override
@@ -1253,12 +1253,12 @@ class BankTransactionCategoryData extends DataClass
       'id': serializer.toJson<int>(id),
       'bank_transaction_id': serializer.toJson<int>(bankTransactionId),
       'category_id': serializer.toJson<int>(categoryId),
-      'amount': serializer.toJson<double>(amount),
+      'amount': serializer.toJson<int>(amount),
     };
   }
 
   BankTransactionCategoryData copyWith(
-          {int? id, int? bankTransactionId, int? categoryId, double? amount}) =>
+          {int? id, int? bankTransactionId, int? categoryId, int? amount}) =>
       BankTransactionCategoryData(
         id: id ?? this.id,
         bankTransactionId: bankTransactionId ?? this.bankTransactionId,
@@ -1293,7 +1293,7 @@ class BankTransactionCategoryCompanion
   final Value<int> id;
   final Value<int> bankTransactionId;
   final Value<int> categoryId;
-  final Value<double> amount;
+  final Value<int> amount;
   const BankTransactionCategoryCompanion({
     this.id = const Value.absent(),
     this.bankTransactionId = const Value.absent(),
@@ -1304,7 +1304,7 @@ class BankTransactionCategoryCompanion
     this.id = const Value.absent(),
     required int bankTransactionId,
     required int categoryId,
-    required double amount,
+    required int amount,
   })  : bankTransactionId = Value(bankTransactionId),
         categoryId = Value(categoryId),
         amount = Value(amount);
@@ -1312,7 +1312,7 @@ class BankTransactionCategoryCompanion
     Expression<int>? id,
     Expression<int>? bankTransactionId,
     Expression<int>? categoryId,
-    Expression<double>? amount,
+    Expression<int>? amount,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -1326,7 +1326,7 @@ class BankTransactionCategoryCompanion
       {Value<int>? id,
       Value<int>? bankTransactionId,
       Value<int>? categoryId,
-      Value<double>? amount}) {
+      Value<int>? amount}) {
     return BankTransactionCategoryCompanion(
       id: id ?? this.id,
       bankTransactionId: bankTransactionId ?? this.bankTransactionId,
@@ -1348,7 +1348,7 @@ class BankTransactionCategoryCompanion
       map['category_id'] = Variable<int>(categoryId.value);
     }
     if (amount.present) {
-      map['amount'] = Variable<double>(amount.value);
+      map['amount'] = Variable<int>(amount.value);
     }
     return map;
   }
@@ -1397,12 +1397,12 @@ abstract class _$MainDatabase extends GeneratedDatabase {
   late final Trigger transactionDeletedUpdateAccount = Trigger(
       'CREATE TRIGGER IF NOT EXISTS transaction_deleted_update_account AFTER DELETE ON bank_transactions BEGIN UPDATE accounts SET balance = balance - OLD.amount WHERE id = OLD.account_id;END',
       'transaction_deleted_update_account');
-  Selectable<double> moneyInBank() {
+  Selectable<int> moneyInBank() {
     return customSelect('SELECT SUM(balance) AS _c0 FROM accounts',
         variables: [],
         readsFrom: {
           accounts,
-        }).map((QueryRow row) => row.read<double>('_c0'));
+        }).map((QueryRow row) => row.read<int>('_c0'));
   }
 
   @override

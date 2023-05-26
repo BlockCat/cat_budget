@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 
 @immutable
@@ -33,13 +35,27 @@ class _ExpandableFabState extends State<ExpandableFab>
       duration: const Duration(milliseconds: 250),
       vsync: this,
     );
-    _expandAnimation =
-        CurvedAnimation(parent: _controller, curve: Curves.fastOutSlowIn);
+    _expandAnimation = CurvedAnimation(
+      parent: _controller,
+      curve: Curves.fastOutSlowIn,
+      reverseCurve: Curves.fastOutSlowIn.flipped,
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 
   void _toggle() {
     setState(() {
       _open = !_open;
+      if (_open) {
+        _controller.forward();
+      } else {
+        _controller.reverse();
+      }
     });
   }
 
@@ -51,6 +67,7 @@ class _ExpandableFabState extends State<ExpandableFab>
           clipBehavior: Clip.none,
           children: [
             _buildTapToCloseFab(),
+            ..._buildExpandingActionButtons(),
             _buildTapToOpenFab(),
           ]),
     );
@@ -65,12 +82,9 @@ class _ExpandableFabState extends State<ExpandableFab>
           shape: const CircleBorder(),
           clipBehavior: Clip.antiAlias,
           elevation: 4.0,
-          child: InkWell(
-            onTap: _toggle,
-            child: Padding(
-              padding: const EdgeInsets.all(8),
-              child: Icon(Icons.close, color: Theme.of(context).primaryColor),
-            ),
+          child: FloatingActionButton(
+            onPressed: _toggle,
+            child: Icon(Icons.close, color: Theme.of(context).primaryColor),
           ),
         ),
       ),
@@ -98,6 +112,25 @@ class _ExpandableFabState extends State<ExpandableFab>
       ),
     );
   }
+
+  List<Widget> _buildExpandingActionButtons() {
+    final children = <Widget>[];
+    final count = widget.children.length;
+    final step = 90.0 / (count - 0.5);
+    for (var i = 0, angleInDegrees = step / 2;
+        i < count;
+        i++, angleInDegrees += step) {
+      children.add(
+        _ExpandingActionButton(
+          directionInDegrees: angleInDegrees,
+          maxDistance: widget.distance,
+          progress: _expandAnimation,
+          child: widget.children[i],
+        ),
+      );
+    }
+    return children;
+  }
 }
 
 class ActionButton extends StatelessWidget {
@@ -120,6 +153,47 @@ class ActionButton extends StatelessWidget {
           onPressed: onPressed,
           icon: icon,
           color: theme.colorScheme.onSecondary,
+          iconSize: 32.0,
         ));
+  }
+}
+
+@immutable
+class _ExpandingActionButton extends StatelessWidget {
+  const _ExpandingActionButton({
+    required this.directionInDegrees,
+    required this.maxDistance,
+    required this.progress,
+    required this.child,
+  });
+
+  final double directionInDegrees;
+  final double maxDistance;
+  final Animation<double> progress;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: progress,
+      builder: (context, child) {
+        final offset = Offset.fromDirection(
+          directionInDegrees * (pi / 180.0),
+          progress.value * maxDistance,
+        );
+        return Positioned(
+          right: 4.0 + offset.dx,
+          bottom: 4.0 + offset.dy,
+          child: Transform.rotate(
+            angle: (1.0 - progress.value) * pi / 2,
+            child: child!,
+          ),
+        );
+      },
+      child: FadeTransition(
+        opacity: progress,
+        child: child,
+      ),
+    );
   }
 }
