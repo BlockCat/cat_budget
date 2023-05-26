@@ -84,10 +84,6 @@ void main() {
         .watchSingle()
         .map((event) => event.balance);
 
-    envelope1BalanceStream.listen((event) {
-      print('envelope1BalanceStream: $event');
-    });
-
     final envelope1Balance =
         expectLater(envelope1BalanceStream, emitsInOrder([90, 45, -45]));
     final envelope2Balance = expectLater(
@@ -109,14 +105,13 @@ void main() {
             amount: -90,
             date: DateTime.utc(2023, 10, 15)));
 
-
-    await database.bankTransactionCategory
-        .insertOne(BankTransactionCategoryCompanion.insert(
+    await database.bankTransactionCategory.insertOne(
+        BankTransactionCategoryCompanion.insert(
             bankTransactionId: transactionId,
             categoryId: category1Id,
             amount: -45));
-    await database.bankTransactionCategory
-        .insertOne(BankTransactionCategoryCompanion.insert(
+    await database.bankTransactionCategory.insertOne(
+        BankTransactionCategoryCompanion.insert(
             bankTransactionId: transaction2Id,
             categoryId: category1Id,
             amount: -90));

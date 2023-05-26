@@ -2,8 +2,8 @@ import 'package:cat_budget/pages/dashboard/dashboard_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-class HomePage extends StatelessWidget {
-  const HomePage({super.key});
+class DashboardPage extends StatelessWidget {
+  const DashboardPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -15,13 +15,115 @@ class _HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        drawer: Drawer(
-          child: ListView(
-            padding: EdgeInsets.zero,
-            children: const [DrawerHeader(child: Text('CatBudget'))],
+      appBar: AppBar(
+        title: const Text('CatBudget'),
+      ),
+      body: ListView(
+        children: const [
+          SizedBox(
+            height: 40,
+            child: Placeholder(),
           ),
-        ),
-        appBar: AppBar(title: const Text('CatBudget')),
-        body: const Text('Hello World'));
+          SizedBox(
+            height: 40,
+            child: Placeholder(),
+          ),
+          SizedBox(
+            height: 40,
+            child: Placeholder(),
+          ),
+          SizedBox(
+            height: 40,
+            child: Placeholder(),
+          ),
+          SizedBox(
+            height: 40,
+            child: Placeholder(),
+          ),
+          SizedBox(
+            height: 40,
+            child: Placeholder(),
+          ),
+          Divider(),
+          ListTile(
+            title: Text('Other category'),
+            subtitle: Text('total budget account: \$0.00'),
+          ),
+          Divider(),
+          SizedBox(
+            height: 40,
+            child: Placeholder(),
+          ),
+          SizedBox(
+            height: 40,
+            child: Placeholder(),
+          ),
+          SizedBox(
+            height: 40,
+            child: Placeholder(),
+          ),
+          SizedBox(
+            height: 40,
+            child: Placeholder(),
+          ),
+          SizedBox(
+            height: 40,
+            child: Placeholder(),
+          ),
+          SizedBox(
+            height: 40,
+            child: Placeholder(),
+          ),
+           SizedBox(
+            height: 40,
+            child: Placeholder(),
+          ),
+          SizedBox(
+            height: 40,
+            child: Placeholder(),
+          ),
+          SizedBox(
+            height: 40,
+            child: Placeholder(),
+          ),
+          SizedBox(
+            height: 40,
+            child: Placeholder(),
+          ),
+          SizedBox(
+            height: 40,
+            child: Placeholder(),
+          ),
+          SizedBox(
+            height: 40,
+            child: Placeholder(),
+          ),
+           SizedBox(
+            height: 40,
+            child: Placeholder(),
+          ),
+          SizedBox(
+            height: 40,
+            child: Placeholder(),
+          ),
+          SizedBox(
+            height: 40,
+            child: Placeholder(),
+          ),
+          SizedBox(
+            height: 40,
+            child: Placeholder(),
+          ),
+          SizedBox(
+            height: 40,
+            child: Placeholder(),
+          ),
+          SizedBox(
+            height: 40,
+            child: Placeholder(),
+          ),
+        ],
+      ),
+    );
   }
 }

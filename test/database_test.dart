@@ -1,6 +1,5 @@
 import 'package:cat_budget/data/database/database.dart';
 import 'package:drift/drift.dart';
-import 'package:drift/native.dart';
 import 'package:test/test.dart';
 
 void main() {
