@@ -1,6 +1,7 @@
 import 'package:cat_budget/pages/dashboard/dashboard_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
 class DashboardPage extends StatelessWidget {
   const DashboardPage({super.key});
@@ -17,6 +18,14 @@ class _HomePage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('CatBudget'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.settings),
+            onPressed: () {
+              context.push('/categories/edit');
+            },
+          )
+        ],
       ),
       body: ListView(
         children: const [
@@ -74,10 +83,6 @@ class _HomePage extends StatelessWidget {
             height: 40,
             child: Placeholder(),
           ),
-           SizedBox(
-            height: 40,
-            child: Placeholder(),
-          ),
           SizedBox(
             height: 40,
             child: Placeholder(),
@@ -98,7 +103,11 @@ class _HomePage extends StatelessWidget {
             height: 40,
             child: Placeholder(),
           ),
-           SizedBox(
+          SizedBox(
+            height: 40,
+            child: Placeholder(),
+          ),
+          SizedBox(
             height: 40,
             child: Placeholder(),
           ),

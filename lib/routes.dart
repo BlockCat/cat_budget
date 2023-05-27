@@ -2,6 +2,8 @@ import 'package:cat_budget/pages/accounts/account_page.dart';
 import 'package:cat_budget/pages/accounts/add_account_page.dart';
 import 'package:cat_budget/pages/accounts/ing/add_ing_account_page.dart';
 import 'package:cat_budget/pages/dashboard/dashboard.dart';
+import 'package:cat_budget/pages/dashboard/edit_categories/edit_category_page.dart';
+import 'package:cat_budget/pages/transactions/add_transaction_page.dart';
 import 'package:cat_budget/pages/transactions/transaction_page.dart';
 import 'package:cat_budget/services/budget/bottom_navbar.dart';
 import 'package:flutter/material.dart';
@@ -26,6 +28,12 @@ final GoRouter router =
           path: '/',
           builder: (context, state) => const DashboardPage(
             key: Key('dashboard.page'),
+          ),
+        ),
+        GoRoute(
+          path: '/categories/edit',
+          pageBuilder: (context, state) => const NoTransitionPage(
+            child: EditCategoryPage(),
           ),
         ),
         GoRoute(
@@ -77,6 +85,26 @@ final GoRouter router =
               key: Key('transactions.page'),
             ),
           ),
+          routes: [
+            GoRoute(
+              path: 'add',
+              builder: (context, state) => Scaffold(
+                appBar: AppBar(
+                  title: const Text('Add transaction'),
+                ),
+                body: AddTransactionPage(),
+              ),
+            ),
+            GoRoute(
+              path: 'edit/:id',
+              builder: (context, state) => Scaffold(
+                appBar: AppBar(
+                  title: const Text('Edit transaction'),
+                ),
+                body: Placeholder(),
+              ),
+            ),
+          ],
         ),
       ]),
 ]);

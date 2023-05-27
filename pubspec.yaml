@@ -48,6 +48,7 @@ dependencies:
   path: ^1.8.3
   go_router: ^7.1.1
   simple_icons: ^7.10.0
+  drag_and_drop_lists: ^0.3.3
 dev_dependencies:
   drift_dev: ^2.8.2
   flutter_test:

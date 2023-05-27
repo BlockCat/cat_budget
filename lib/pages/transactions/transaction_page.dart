@@ -4,6 +4,7 @@ import 'package:cat_budget/pages/dashboard/dashboard_bloc.dart';
 import 'package:cat_budget/widgets/transaction/transaction_entry_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:simple_icons/simple_icons.dart';
 
 class TransactionPage extends StatelessWidget {
@@ -55,6 +56,12 @@ class _TransactionPage extends StatelessWidget {
             padding: EdgeInsets.zero,
             children: const [DrawerHeader(child: Text('CatBudget'))],
           ),
+        ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            context.push('/transactions/add');
+          },
+          child: const Icon(Icons.add),
         ),
         body: Center(child: ListView(children: transactions)));
   }

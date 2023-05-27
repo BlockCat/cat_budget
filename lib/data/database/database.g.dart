@@ -293,11 +293,12 @@ class AccountsCompanion extends UpdateCompanion<Account> {
   }
 }
 
-class Categories extends Table with TableInfo<Categories, Category> {
+class CategoryGroups extends Table
+    with TableInfo<CategoryGroups, CategoryGroup> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
-  Categories(this.attachedDatabase, [this._alias]);
+  CategoryGroups(this.attachedDatabase, [this._alias]);
   static const VerificationMeta _idMeta = const VerificationMeta('id');
   late final GeneratedColumn<int> id = GeneratedColumn<int>(
       'id', aliasedName, false,
@@ -321,11 +322,11 @@ class Categories extends Table with TableInfo<Categories, Category> {
   @override
   List<GeneratedColumn> get $columns => [id, name, description];
   @override
-  String get aliasedName => _alias ?? 'categories';
+  String get aliasedName => _alias ?? 'category_groups';
   @override
-  String get actualTableName => 'categories';
+  String get actualTableName => 'category_groups';
   @override
-  VerificationContext validateIntegrity(Insertable<Category> instance,
+  VerificationContext validateIntegrity(Insertable<CategoryGroup> instance,
       {bool isInserting = false}) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
@@ -350,9 +351,9 @@ class Categories extends Table with TableInfo<Categories, Category> {
   @override
   Set<GeneratedColumn> get $primaryKey => {id};
   @override
-  Category map(Map<String, dynamic> data, {String? tablePrefix}) {
+  CategoryGroup map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return Category(
+    return CategoryGroup(
       id: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
       name: attachedDatabase.typeMapping
@@ -363,19 +364,19 @@ class Categories extends Table with TableInfo<Categories, Category> {
   }
 
   @override
-  Categories createAlias(String alias) {
-    return Categories(attachedDatabase, alias);
+  CategoryGroups createAlias(String alias) {
+    return CategoryGroups(attachedDatabase, alias);
   }
 
   @override
   bool get dontWriteConstraints => true;
 }
 
-class Category extends DataClass implements Insertable<Category> {
+class CategoryGroup extends DataClass implements Insertable<CategoryGroup> {
   final int id;
   final String name;
   final String? description;
-  const Category({required this.id, required this.name, this.description});
+  const CategoryGroup({required this.id, required this.name, this.description});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -387,8 +388,8 @@ class Category extends DataClass implements Insertable<Category> {
     return map;
   }
 
-  CategoriesCompanion toCompanion(bool nullToAbsent) {
-    return CategoriesCompanion(
+  CategoryGroupsCompanion toCompanion(bool nullToAbsent) {
+    return CategoryGroupsCompanion(
       id: Value(id),
       name: Value(name),
       description: description == null && nullToAbsent
@@ -397,10 +398,10 @@ class Category extends DataClass implements Insertable<Category> {
     );
   }
 
-  factory Category.fromJson(Map<String, dynamic> json,
+  factory CategoryGroup.fromJson(Map<String, dynamic> json,
       {ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
-    return Category(
+    return CategoryGroup(
       id: serializer.fromJson<int>(json['id']),
       name: serializer.fromJson<String>(json['name']),
       description: serializer.fromJson<String?>(json['description']),
@@ -416,18 +417,18 @@ class Category extends DataClass implements Insertable<Category> {
     };
   }
 
-  Category copyWith(
+  CategoryGroup copyWith(
           {int? id,
           String? name,
           Value<String?> description = const Value.absent()}) =>
-      Category(
+      CategoryGroup(
         id: id ?? this.id,
         name: name ?? this.name,
         description: description.present ? description.value : this.description,
       );
   @override
   String toString() {
-    return (StringBuffer('Category(')
+    return (StringBuffer('CategoryGroup(')
           ..write('id: $id, ')
           ..write('name: $name, ')
           ..write('description: $description')
@@ -440,27 +441,27 @@ class Category extends DataClass implements Insertable<Category> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is Category &&
+      (other is CategoryGroup &&
           other.id == this.id &&
           other.name == this.name &&
           other.description == this.description);
 }
 
-class CategoriesCompanion extends UpdateCompanion<Category> {
+class CategoryGroupsCompanion extends UpdateCompanion<CategoryGroup> {
   final Value<int> id;
   final Value<String> name;
   final Value<String?> description;
-  const CategoriesCompanion({
+  const CategoryGroupsCompanion({
     this.id = const Value.absent(),
     this.name = const Value.absent(),
     this.description = const Value.absent(),
   });
-  CategoriesCompanion.insert({
+  CategoryGroupsCompanion.insert({
     this.id = const Value.absent(),
     required String name,
     this.description = const Value.absent(),
   }) : name = Value(name);
-  static Insertable<Category> custom({
+  static Insertable<CategoryGroup> custom({
     Expression<int>? id,
     Expression<String>? name,
     Expression<String>? description,
@@ -472,9 +473,9 @@ class CategoriesCompanion extends UpdateCompanion<Category> {
     });
   }
 
-  CategoriesCompanion copyWith(
+  CategoryGroupsCompanion copyWith(
       {Value<int>? id, Value<String>? name, Value<String?>? description}) {
-    return CategoriesCompanion(
+    return CategoryGroupsCompanion(
       id: id ?? this.id,
       name: name ?? this.name,
       description: description ?? this.description,
@@ -498,9 +499,275 @@ class CategoriesCompanion extends UpdateCompanion<Category> {
 
   @override
   String toString() {
+    return (StringBuffer('CategoryGroupsCompanion(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('description: $description')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class Categories extends Table with TableInfo<Categories, Category> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  Categories(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+      'id', aliasedName, false,
+      hasAutoIncrement: true,
+      type: DriftSqlType.int,
+      requiredDuringInsert: false,
+      $customConstraints: 'PRIMARY KEY AUTOINCREMENT NOT NULL');
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+      'name', aliasedName, false,
+      type: DriftSqlType.string,
+      requiredDuringInsert: true,
+      $customConstraints: 'UNIQUE NOT NULL');
+  static const VerificationMeta _categoryGroupIdMeta =
+      const VerificationMeta('categoryGroupId');
+  late final GeneratedColumn<int> categoryGroupId = GeneratedColumn<int>(
+      'category_group_id', aliasedName, true,
+      type: DriftSqlType.int,
+      requiredDuringInsert: false,
+      $customConstraints: '');
+  static const VerificationMeta _descriptionMeta =
+      const VerificationMeta('description');
+  late final GeneratedColumn<String> description = GeneratedColumn<String>(
+      'description', aliasedName, true,
+      type: DriftSqlType.string,
+      requiredDuringInsert: false,
+      $customConstraints: '');
+  @override
+  List<GeneratedColumn> get $columns =>
+      [id, name, categoryGroupId, description];
+  @override
+  String get aliasedName => _alias ?? 'categories';
+  @override
+  String get actualTableName => 'categories';
+  @override
+  VerificationContext validateIntegrity(Insertable<Category> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+          _nameMeta, name.isAcceptableOrUnknown(data['name']!, _nameMeta));
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (data.containsKey('category_group_id')) {
+      context.handle(
+          _categoryGroupIdMeta,
+          categoryGroupId.isAcceptableOrUnknown(
+              data['category_group_id']!, _categoryGroupIdMeta));
+    }
+    if (data.containsKey('description')) {
+      context.handle(
+          _descriptionMeta,
+          description.isAcceptableOrUnknown(
+              data['description']!, _descriptionMeta));
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  Category map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return Category(
+      id: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
+      name: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}name'])!,
+      categoryGroupId: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}category_group_id']),
+      description: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}description']),
+    );
+  }
+
+  @override
+  Categories createAlias(String alias) {
+    return Categories(attachedDatabase, alias);
+  }
+
+  @override
+  List<String> get customConstraints => const [
+        'FOREIGN KEY(category_group_id)REFERENCES category_groups(id)ON DELETE SET NULL'
+      ];
+  @override
+  bool get dontWriteConstraints => true;
+}
+
+class Category extends DataClass implements Insertable<Category> {
+  final int id;
+  final String name;
+  final int? categoryGroupId;
+  final String? description;
+  const Category(
+      {required this.id,
+      required this.name,
+      this.categoryGroupId,
+      this.description});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['name'] = Variable<String>(name);
+    if (!nullToAbsent || categoryGroupId != null) {
+      map['category_group_id'] = Variable<int>(categoryGroupId);
+    }
+    if (!nullToAbsent || description != null) {
+      map['description'] = Variable<String>(description);
+    }
+    return map;
+  }
+
+  CategoriesCompanion toCompanion(bool nullToAbsent) {
+    return CategoriesCompanion(
+      id: Value(id),
+      name: Value(name),
+      categoryGroupId: categoryGroupId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(categoryGroupId),
+      description: description == null && nullToAbsent
+          ? const Value.absent()
+          : Value(description),
+    );
+  }
+
+  factory Category.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return Category(
+      id: serializer.fromJson<int>(json['id']),
+      name: serializer.fromJson<String>(json['name']),
+      categoryGroupId: serializer.fromJson<int?>(json['category_group_id']),
+      description: serializer.fromJson<String?>(json['description']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'name': serializer.toJson<String>(name),
+      'category_group_id': serializer.toJson<int?>(categoryGroupId),
+      'description': serializer.toJson<String?>(description),
+    };
+  }
+
+  Category copyWith(
+          {int? id,
+          String? name,
+          Value<int?> categoryGroupId = const Value.absent(),
+          Value<String?> description = const Value.absent()}) =>
+      Category(
+        id: id ?? this.id,
+        name: name ?? this.name,
+        categoryGroupId: categoryGroupId.present
+            ? categoryGroupId.value
+            : this.categoryGroupId,
+        description: description.present ? description.value : this.description,
+      );
+  @override
+  String toString() {
+    return (StringBuffer('Category(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('categoryGroupId: $categoryGroupId, ')
+          ..write('description: $description')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, name, categoryGroupId, description);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is Category &&
+          other.id == this.id &&
+          other.name == this.name &&
+          other.categoryGroupId == this.categoryGroupId &&
+          other.description == this.description);
+}
+
+class CategoriesCompanion extends UpdateCompanion<Category> {
+  final Value<int> id;
+  final Value<String> name;
+  final Value<int?> categoryGroupId;
+  final Value<String?> description;
+  const CategoriesCompanion({
+    this.id = const Value.absent(),
+    this.name = const Value.absent(),
+    this.categoryGroupId = const Value.absent(),
+    this.description = const Value.absent(),
+  });
+  CategoriesCompanion.insert({
+    this.id = const Value.absent(),
+    required String name,
+    this.categoryGroupId = const Value.absent(),
+    this.description = const Value.absent(),
+  }) : name = Value(name);
+  static Insertable<Category> custom({
+    Expression<int>? id,
+    Expression<String>? name,
+    Expression<int>? categoryGroupId,
+    Expression<String>? description,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (name != null) 'name': name,
+      if (categoryGroupId != null) 'category_group_id': categoryGroupId,
+      if (description != null) 'description': description,
+    });
+  }
+
+  CategoriesCompanion copyWith(
+      {Value<int>? id,
+      Value<String>? name,
+      Value<int?>? categoryGroupId,
+      Value<String?>? description}) {
+    return CategoriesCompanion(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      categoryGroupId: categoryGroupId ?? this.categoryGroupId,
+      description: description ?? this.description,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (categoryGroupId.present) {
+      map['category_group_id'] = Variable<int>(categoryGroupId.value);
+    }
+    if (description.present) {
+      map['description'] = Variable<String>(description.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
     return (StringBuffer('CategoriesCompanion(')
           ..write('id: $id, ')
           ..write('name: $name, ')
+          ..write('categoryGroupId: $categoryGroupId, ')
           ..write('description: $description')
           ..write(')'))
         .toString();
@@ -1368,6 +1635,7 @@ class BankTransactionCategoryCompanion
 abstract class _$MainDatabase extends GeneratedDatabase {
   _$MainDatabase(QueryExecutor e) : super(e);
   late final Accounts accounts = Accounts(this);
+  late final CategoryGroups categoryGroups = CategoryGroups(this);
   late final Categories categories = Categories(this);
   late final CategoryEnvelopes categoryEnvelopes = CategoryEnvelopes(this);
   late final BankTransactions bankTransactions = BankTransactions(this);
@@ -1411,6 +1679,7 @@ abstract class _$MainDatabase extends GeneratedDatabase {
   @override
   List<DatabaseSchemaEntity> get allSchemaEntities => [
         accounts,
+        categoryGroups,
         categories,
         categoryEnvelopes,
         bankTransactions,
@@ -1427,6 +1696,13 @@ abstract class _$MainDatabase extends GeneratedDatabase {
   @override
   StreamQueryUpdateRules get streamUpdateRules => const StreamQueryUpdateRules(
         [
+          WritePropagation(
+            on: TableUpdateQuery.onTableName('category_groups',
+                limitUpdateKind: UpdateKind.delete),
+            result: [
+              TableUpdate('categories', kind: UpdateKind.update),
+            ],
+          ),
           WritePropagation(
             on: TableUpdateQuery.onTableName('categories',
                 limitUpdateKind: UpdateKind.delete),
