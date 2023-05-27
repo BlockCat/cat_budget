@@ -20,7 +20,7 @@ class Accounts extends Table with TableInfo<Accounts, Account> {
       'name', aliasedName, false,
       type: DriftSqlType.string,
       requiredDuringInsert: true,
-      $customConstraints: 'UNIQUE NOT NULL');
+      $customConstraints: 'NOT NULL');
   static const VerificationMeta _descriptionMeta =
       const VerificationMeta('description');
   late final GeneratedColumn<String> description = GeneratedColumn<String>(

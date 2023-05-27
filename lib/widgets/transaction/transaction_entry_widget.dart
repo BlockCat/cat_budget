@@ -12,7 +12,7 @@ class TransactionEntryWidget extends StatelessWidget {
   final int id;
   final String name;
   final String accountName;
-  final double money;
+  final int money;
   final Icon? icon;
 
   @override
@@ -48,7 +48,7 @@ class TransactionEntryWidget extends StatelessWidget {
                   child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text(money.toStringAsFixed(2),
+                        Text((money / 100.0).toStringAsFixed(2),
                             style: TextStyle(
                                 fontSize: 20,
                                 color: money > 0

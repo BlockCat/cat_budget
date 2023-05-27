@@ -46,7 +46,7 @@ class _TransactionPage extends StatelessWidget {
           icon: icons[random.nextInt(icons.length)],
           name: 'Spotify',
           accountName: 'ING Bank',
-          money: 10.23 - i));
+          money: 1023 - i));
     }
 
     return Scaffold(
