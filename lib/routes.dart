@@ -32,7 +32,7 @@ final GoRouter router =
         ),
         GoRoute(
           path: '/categories/edit',
-          pageBuilder: (context, state) => const NoTransitionPage(
+          pageBuilder: (context, state) => NoTransitionPage(
             child: EditCategoryPage(),
           ),
         ),

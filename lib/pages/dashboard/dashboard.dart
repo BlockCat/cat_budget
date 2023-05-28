@@ -21,8 +21,10 @@ class _HomePage extends StatelessWidget {
         actions: [
           IconButton(
             icon: const Icon(Icons.settings),
-            onPressed: () {
-              context.push('/categories/edit');
+            onPressed: () async {
+              var result = await context.push('/categories/edit');
+
+              print("Result: $result");
             },
           )
         ],

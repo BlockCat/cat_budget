@@ -1,11 +1,16 @@
 import 'package:cat_budget/data/database/database.dart';
-import 'package:drag_and_drop_lists/drag_and_drop_item.dart';
-import 'package:drag_and_drop_lists/drag_and_drop_list.dart';
-import 'package:drag_and_drop_lists/drag_and_drop_lists.dart';
+import 'package:cat_budget/pages/dashboard/edit_categories/entry_category.dart';
+import 'package:cat_budget/pages/dashboard/edit_categories/edit_category.dart';
+import 'package:cat_budget/pages/dashboard/edit_categories/entry_group_category.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
+import 'package:go_router/go_router.dart';
 
 class EditCategoryPage extends StatelessWidget {
-  const EditCategoryPage({Key? key}) : super(key: key);
+  EditCategoryPage({Key? key}) : super(key: key);
+
+  final categoryListKey = GlobalKey(debugLabel: "categoryListKey");
 
   @override
   Widget build(BuildContext context) {
@@ -16,16 +21,23 @@ class EditCategoryPage extends StatelessWidget {
       body: Column(
         children: [
           ElevatedButton(
-            onPressed: () {},
+            onPressed: () async {
+              final state =
+                  categoryListKey.currentState as _CategoryListEditorState?;
+              if (state != null) {
+                await saveCategories(state._categories);
+                await state._loadCategories();
+                // return context.pop();
+              }
+              // return context.pop();
+            },
             child: const Text("Save or something"),
           ),
           Expanded(
             child: Container(
-                padding: EdgeInsets.all(10),
-                child: CategoryListEditor(),
-                decoration: BoxDecoration(
-                  border: Border.all(),
-                  borderRadius: BorderRadius.circular(7.0),
+                padding: const EdgeInsets.symmetric(vertical: 10),
+                child: CategoryListEditor(
+                  key: categoryListKey,
                 )),
           ),
         ],
@@ -35,186 +47,272 @@ class EditCategoryPage extends StatelessWidget {
 }
 
 class CategoryListEditor extends StatefulWidget {
+  const CategoryListEditor({super.key});
+
   @override
   State<StatefulWidget> createState() => _CategoryListEditorState();
 }
 
 class _CategoryListEditorState extends State<CategoryListEditor> {
-  List<DragAndDropList> _entries = [];
+  List<CategoryTree> _categories = [];
 
   @override
   void initState() {
     super.initState();
+    _loadCategories();
+  }
+
+  _loadCategories() async {
+    final database = GetIt.I.get<MainDatabase>();
+    final categories = await loadCategories(database);
+
     setState(() {
-      _entries = [
-        DragAndDropList(
-          header: _CategoryListGroupEntry(
-            const CategoryGroup(id: 0, name: "Group 1"),
-          ),
-          children: [
-            DragAndDropItem(child: const ListTile(title: Text('Category 1'))),
-            DragAndDropItem(child: const ListTile(title: Text('Category 2'))),
-            DragAndDropItem(child: const ListTile(title: Text('Category 3'))),
-          ],
-        ),
-        DragAndDropList(
-          header: _CategoryListGroupEntry(
-            const CategoryGroup(id: 1, name: "Group 3"),
-          ),
-          children: [
-            DragAndDropItem(child: const ListTile(title: Text('Category 4'))),
-            DragAndDropItem(child: const ListTile(title: Text('Category 5'))),
-            DragAndDropItem(child: const ListTile(title: Text('Category 6'))),
-          ],
-        ),
-        DragAndDropList(
-          header: _CategoryListGroupEntry(
-            const CategoryGroup(id: 2, name: "Group 2"),
-          ),
-          children: [
-            DragAndDropItem(
-              child: const ListTile(title: Text('Category 7')),
-            ),
-            DragAndDropItem(
-              child: const ListTile(title: Text('Category 8')),
-              feedbackWidget: const ListTile(title: Text('Category 8')),
-            ),
-            DragAndDropItem(
-              child: const ListTile(title: Text('Category 9')),
-            ),
-          ],
-        ),
-      ];
+      _categories = categories;
     });
   }
-
-  @override
-  Widget build(BuildContext context) {
-    return DragAndDropLists(
-      children: _entries,
-      onItemReorder: _onItemReorder,
-      onListReorder: _onListReorder,
-      listGhost: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 30.0),
-        child: Center(
-          child: Container(
-            padding:
-                const EdgeInsets.symmetric(vertical: 40.0, horizontal: 100.0),
-            decoration: BoxDecoration(
-              border: Border.all(),
-              borderRadius: BorderRadius.circular(7.0),
-            ),
-            child: const Icon(Icons.add_box),
-          ),
-        ),
-      ),
-      listPadding: const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
-      contentsWhenEmpty: Row(
-        children: <Widget>[
-          const Expanded(
-            child: Padding(
-              padding: EdgeInsets.only(left: 40, right: 10),
-              child: Divider(),
-            ),
-          ),
-          Text(
-            'Empty List',
-            style: TextStyle(
-                color: Theme.of(context).textTheme.caption!.color,
-                fontStyle: FontStyle.italic),
-          ),
-          const Expanded(
-            child: Padding(
-              padding: EdgeInsets.only(left: 20, right: 40),
-              child: Divider(),
-            ),
-          ),
-        ],
-      ),
-      listDecoration: BoxDecoration(
-        color: Theme.of(context).canvasColor,
-        borderRadius: const BorderRadius.all(Radius.circular(6.0)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.5),
-            spreadRadius: 2,
-            blurRadius: 3,
-            offset: const Offset(0, 3), // changes position of shadow
-          ),
-        ],
-      ),
-      listDragHandle: const DragHandle(
-        verticalAlignment: DragHandleVerticalAlignment.top,
-        child: Padding(
-          padding: EdgeInsets.only(right: 10),
-          child: Icon(
-            Icons.menu,
-            color: Colors.black26,
-          ),
-        ),
-      ),
-      itemDragHandle: const DragHandle(
-        child: Padding(
-          padding: EdgeInsets.only(right: 10),
-          child: Icon(
-            Icons.menu,
-            color: Colors.blueGrey,
-          ),
-        ),
-      ),
-    );
-  }
-
-  _onItemReorder(
-      int oldItemIndex, int oldListIndex, int newItemIndex, int newListIndex) {
-    setState(() {
-      var movedItem = _entries[oldListIndex].children.removeAt(oldItemIndex);
-      _entries[newListIndex].children.insert(newItemIndex, movedItem);
-    });
-  }
-
-  _onListReorder(int oldListIndex, int newListIndex) {
-    setState(() {
-      var movedList = _entries.removeAt(oldListIndex);
-      _entries.insert(newListIndex, movedList);
-    });
-  }
-}
-
-abstract class _CategoryListEntry extends StatelessWidget {
-  Key get key;
-}
-
-class _CategoryListGroupEntry extends _CategoryListEntry {
-  final CategoryGroup group;
-
-  @override
-  Key get key => Key('group-${group.id}');
-
-  _CategoryListGroupEntry(this.group);
 
   @override
   Widget build(BuildContext context) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        ListTile(title: Text(group.name)),
-        const Divider(),
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: ElevatedButton(
+            onPressed: _onAddCategoryGroupPressed,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color.fromARGB(255, 59, 148, 221),
+              foregroundColor: Colors.white,
+            ),
+            child: const Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.add),
+                  Text("Add Category Group"),
+                ]),
+          ),
+        ),
+        Expanded(
+          child: ListView.builder(
+              key: const Key("category-list"),
+              itemCount: _categories.length,
+              itemBuilder: (context, index) {
+                final categoryTree = _categories[index];
+                return Column(
+                    key: Key('group-${categoryTree.group.id}'),
+                    children: [
+                      CategoryGroupEntryWidget(
+                        categoryTree: categoryTree,
+                        onAddCategoryPressed: _onAddCategoryPressed,
+                        onEditCategoryGroupPressed: (tree) =>
+                            _onEditCategoryGroupPressed(context, index),
+                        onDeleteCategoryGroupPressed: (p0) {
+                          _onDeleteCategoryGroupPressed(context, index);
+                        },
+                      ),
+                      ReorderableListView.builder(
+                        shrinkWrap: true,
+                        itemCount: categoryTree.children.length,
+                        buildDefaultDragHandles: false,
+                        clipBehavior: Clip.hardEdge,
+                        dragStartBehavior: DragStartBehavior.down,
+                        onReorder: (a, b) {
+                          setState(() {
+                            if (b > a) b--;
+                            final item = categoryTree.children.removeAt(a);
+                            categoryTree.children.insert(b, item);
+                          });
+                        },
+                        itemBuilder: (context, index) {
+                          final child = categoryTree.children[index];
+                          return CategoryEntryWidget(
+                            key: Key('category-${child.id.value}'),
+                            child: child,
+                            index: index,
+                            onEditCategoryPressed: () => _onEditCategoryPressed(
+                                categoryTree, child, index),
+                            onDeleteCategoryPressed: () =>
+                                _onDeleteCategoryPressed(
+                                    categoryTree, child, index),
+                          );
+                        },
+                      )
+                    ]);
+              }),
+        ),
       ],
     );
   }
-}
 
-class _CategoryListCategoryEntry extends _CategoryListEntry {
-  final Category category;
+  void _onAddCategoryPressed(CategoryTree categoryTree) async {
+    TempCategory category = await _openEditCategoryModal(null, categoryTree);
 
-  @override
-  Key get key => Key('category-${category.id}');
+    if (category.name.value.isEmpty) return;
 
-  _CategoryListCategoryEntry(this.category);
+    setState(() {
+      categoryTree.children.add(category);
+    });
+  }
 
-  @override
-  Widget build(BuildContext context) {
-    return ListTile(title: Text(category.name));
+  _onEditCategoryPressed(
+      CategoryTree categoryTree, TempCategory child, int childIndex) async {
+    TempCategory category = await _openEditCategoryModal(child, categoryTree);
+
+    setState(() {
+      categoryTree.children[childIndex] = category;
+    });
+  }
+
+  _onDeleteCategoryPressed(
+      CategoryTree categoryTree, TempCategory child, int childIndex) async {
+    if (child.added) {
+      setState(() {
+        categoryTree.children.removeAt(childIndex);
+      });
+    } else {
+      setState(() {
+        categoryTree.children[childIndex] =
+            child.copyTempWith(deleted: !child.deleted);
+      });
+    }
+  }
+
+  Future<TempCategory> _openEditCategoryModal(
+      TempCategory? category, CategoryTree categoryTree) async {
+    final nameController = TextEditingController(text: category?.name.value);
+    final descriptionController =
+        TextEditingController(text: category?.description.value);
+    await showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (context) {
+        return Container(
+          padding: const EdgeInsets.all(10),
+          // height: 210,
+          child: Column(
+            children: [
+              const Text("Edit Category", style: TextStyle(fontSize: 20)),
+              Divider(color: Colors.grey[400]),
+              TextFormField(
+                decoration: const InputDecoration(labelText: "Name"),
+                autocorrect: true,
+                autofocus: true,
+                controller: nameController,
+              ),
+              TextFormField(
+                  decoration: const InputDecoration(labelText: "Description"),
+                  autocorrect: true,
+                  controller: descriptionController),
+              Container(
+                padding: const EdgeInsets.all(10),
+                child: ElevatedButton(
+                  onPressed: () {
+                    context.pop();
+                  },
+                  child: const Text("Close"),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+
+    return TempCategory(
+      id: category?.id.value ?? categoryTree.children.length + 1,
+      added: category == null ? true : category.added,
+      name: nameController.text,
+      description: descriptionController.text,
+    );
+  }
+
+  void _onDeleteCategoryGroupPressed(BuildContext context, int groupIndex) {
+    final group = _categories[groupIndex].group;
+    if (group.added && _categories[groupIndex].children.isEmpty) {
+      setState(() {
+        _categories.removeAt(groupIndex);
+      });
+    } else {
+      setState(() {
+        _categories[groupIndex] = CategoryTree(
+          _categories[groupIndex]
+              .group
+              .copyTempWith(deleted: !_categories[groupIndex].group.deleted),
+          _categories[groupIndex].children,
+        );
+      });
+    }
+  }
+
+  void _onEditCategoryGroupPressed(BuildContext context, int groupIndex) async {
+    final group = _categories[groupIndex].group;
+    final textController = TextEditingController(text: group.name.value);
+    final descriptionController =
+        TextEditingController(text: group.description.value);
+    await showModalBottomSheet<String?>(
+      context: context,
+      enableDrag: true,
+      isScrollControlled: true,
+      builder: (context) {
+        return Container(
+          padding: const EdgeInsets.all(10),
+          height: 250,
+          child: Column(
+            children: [
+              const Text("Edit Group", style: TextStyle(fontSize: 20)),
+              Divider(color: Colors.grey[400]),
+              TextFormField(
+                decoration: const InputDecoration(labelText: "Name"),
+                controller: textController,
+                autocorrect: true,
+                autofocus: true,
+              ),
+              TextFormField(
+                decoration: const InputDecoration(labelText: "Description"),
+                controller: descriptionController,
+                autocorrect: true,
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  context.pop(textController.text);
+                },
+                child: const Text("Close"),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+
+    if (textController.text != group.name.value ||
+        descriptionController.text != group.description.value) {
+      setState(() {
+        _categories[groupIndex] = CategoryTree(
+          TempCategoryGroup(
+            id: group.id.value,
+            name: textController.text,
+            description: descriptionController.text,
+            added: group.added,
+            deleted: group.deleted,
+          ),
+          _categories[groupIndex].children,
+        );
+      });
+    }
+  }
+
+  void _onAddCategoryGroupPressed() {
+    setState(() {
+      _categories = [
+        ..._categories,
+        CategoryTree(
+          TempCategoryGroup(
+              id: _categories.length + 1,
+              name: "<unnamed>",
+              description: null,
+              added: true),
+          [],
+        )
+      ];
+    });
   }
 }

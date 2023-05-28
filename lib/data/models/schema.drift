@@ -9,14 +9,16 @@ CREATE TABLE accounts(
 CREATE TABLE category_groups(
   id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
   name TEXT UNIQUE NOT NULL,
+  sort INTEGER,
   description TEXT
 );
 
 CREATE TABLE categories(
   id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-  name TEXT UNIQUE NOT NULL,
+  name TEXT NOT NULL,
   category_group_id INTEGER,
   description TEXT,
+  sort INTEGER,
   FOREIGN KEY(category_group_id) REFERENCES category_groups(id) ON DELETE SET NULL
 ) AS Category;
 
@@ -139,3 +141,7 @@ END;
 
 
 moneyInBank: SELECT SUM(balance) FROM accounts;
+
+allAccounts: SELECT * FROM accounts;
+allCategories: SELECT * FROM categories ORDER BY sort ASC;
+allCategoryGroups: SELECT * FROM category_groups ORDER BY sort ASC;

@@ -312,6 +312,12 @@ class CategoryGroups extends Table
       type: DriftSqlType.string,
       requiredDuringInsert: true,
       $customConstraints: 'UNIQUE NOT NULL');
+  static const VerificationMeta _sortMeta = const VerificationMeta('sort');
+  late final GeneratedColumn<int> sort = GeneratedColumn<int>(
+      'sort', aliasedName, true,
+      type: DriftSqlType.int,
+      requiredDuringInsert: false,
+      $customConstraints: '');
   static const VerificationMeta _descriptionMeta =
       const VerificationMeta('description');
   late final GeneratedColumn<String> description = GeneratedColumn<String>(
@@ -320,7 +326,7 @@ class CategoryGroups extends Table
       requiredDuringInsert: false,
       $customConstraints: '');
   @override
-  List<GeneratedColumn> get $columns => [id, name, description];
+  List<GeneratedColumn> get $columns => [id, name, sort, description];
   @override
   String get aliasedName => _alias ?? 'category_groups';
   @override
@@ -338,6 +344,10 @@ class CategoryGroups extends Table
           _nameMeta, name.isAcceptableOrUnknown(data['name']!, _nameMeta));
     } else if (isInserting) {
       context.missing(_nameMeta);
+    }
+    if (data.containsKey('sort')) {
+      context.handle(
+          _sortMeta, sort.isAcceptableOrUnknown(data['sort']!, _sortMeta));
     }
     if (data.containsKey('description')) {
       context.handle(
@@ -358,6 +368,8 @@ class CategoryGroups extends Table
           .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
       name: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}name'])!,
+      sort: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}sort']),
       description: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}description']),
     );
@@ -375,13 +387,18 @@ class CategoryGroups extends Table
 class CategoryGroup extends DataClass implements Insertable<CategoryGroup> {
   final int id;
   final String name;
+  final int? sort;
   final String? description;
-  const CategoryGroup({required this.id, required this.name, this.description});
+  const CategoryGroup(
+      {required this.id, required this.name, this.sort, this.description});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     map['id'] = Variable<int>(id);
     map['name'] = Variable<String>(name);
+    if (!nullToAbsent || sort != null) {
+      map['sort'] = Variable<int>(sort);
+    }
     if (!nullToAbsent || description != null) {
       map['description'] = Variable<String>(description);
     }
@@ -392,6 +409,7 @@ class CategoryGroup extends DataClass implements Insertable<CategoryGroup> {
     return CategoryGroupsCompanion(
       id: Value(id),
       name: Value(name),
+      sort: sort == null && nullToAbsent ? const Value.absent() : Value(sort),
       description: description == null && nullToAbsent
           ? const Value.absent()
           : Value(description),
@@ -404,6 +422,7 @@ class CategoryGroup extends DataClass implements Insertable<CategoryGroup> {
     return CategoryGroup(
       id: serializer.fromJson<int>(json['id']),
       name: serializer.fromJson<String>(json['name']),
+      sort: serializer.fromJson<int?>(json['sort']),
       description: serializer.fromJson<String?>(json['description']),
     );
   }
@@ -413,6 +432,7 @@ class CategoryGroup extends DataClass implements Insertable<CategoryGroup> {
     return <String, dynamic>{
       'id': serializer.toJson<int>(id),
       'name': serializer.toJson<String>(name),
+      'sort': serializer.toJson<int?>(sort),
       'description': serializer.toJson<String?>(description),
     };
   }
@@ -420,10 +440,12 @@ class CategoryGroup extends DataClass implements Insertable<CategoryGroup> {
   CategoryGroup copyWith(
           {int? id,
           String? name,
+          Value<int?> sort = const Value.absent(),
           Value<String?> description = const Value.absent()}) =>
       CategoryGroup(
         id: id ?? this.id,
         name: name ?? this.name,
+        sort: sort.present ? sort.value : this.sort,
         description: description.present ? description.value : this.description,
       );
   @override
@@ -431,53 +453,64 @@ class CategoryGroup extends DataClass implements Insertable<CategoryGroup> {
     return (StringBuffer('CategoryGroup(')
           ..write('id: $id, ')
           ..write('name: $name, ')
+          ..write('sort: $sort, ')
           ..write('description: $description')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, name, description);
+  int get hashCode => Object.hash(id, name, sort, description);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is CategoryGroup &&
           other.id == this.id &&
           other.name == this.name &&
+          other.sort == this.sort &&
           other.description == this.description);
 }
 
 class CategoryGroupsCompanion extends UpdateCompanion<CategoryGroup> {
   final Value<int> id;
   final Value<String> name;
+  final Value<int?> sort;
   final Value<String?> description;
   const CategoryGroupsCompanion({
     this.id = const Value.absent(),
     this.name = const Value.absent(),
+    this.sort = const Value.absent(),
     this.description = const Value.absent(),
   });
   CategoryGroupsCompanion.insert({
     this.id = const Value.absent(),
     required String name,
+    this.sort = const Value.absent(),
     this.description = const Value.absent(),
   }) : name = Value(name);
   static Insertable<CategoryGroup> custom({
     Expression<int>? id,
     Expression<String>? name,
+    Expression<int>? sort,
     Expression<String>? description,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (name != null) 'name': name,
+      if (sort != null) 'sort': sort,
       if (description != null) 'description': description,
     });
   }
 
   CategoryGroupsCompanion copyWith(
-      {Value<int>? id, Value<String>? name, Value<String?>? description}) {
+      {Value<int>? id,
+      Value<String>? name,
+      Value<int?>? sort,
+      Value<String?>? description}) {
     return CategoryGroupsCompanion(
       id: id ?? this.id,
       name: name ?? this.name,
+      sort: sort ?? this.sort,
       description: description ?? this.description,
     );
   }
@@ -491,6 +524,9 @@ class CategoryGroupsCompanion extends UpdateCompanion<CategoryGroup> {
     if (name.present) {
       map['name'] = Variable<String>(name.value);
     }
+    if (sort.present) {
+      map['sort'] = Variable<int>(sort.value);
+    }
     if (description.present) {
       map['description'] = Variable<String>(description.value);
     }
@@ -502,6 +538,7 @@ class CategoryGroupsCompanion extends UpdateCompanion<CategoryGroup> {
     return (StringBuffer('CategoryGroupsCompanion(')
           ..write('id: $id, ')
           ..write('name: $name, ')
+          ..write('sort: $sort, ')
           ..write('description: $description')
           ..write(')'))
         .toString();
@@ -525,7 +562,7 @@ class Categories extends Table with TableInfo<Categories, Category> {
       'name', aliasedName, false,
       type: DriftSqlType.string,
       requiredDuringInsert: true,
-      $customConstraints: 'UNIQUE NOT NULL');
+      $customConstraints: 'NOT NULL');
   static const VerificationMeta _categoryGroupIdMeta =
       const VerificationMeta('categoryGroupId');
   late final GeneratedColumn<int> categoryGroupId = GeneratedColumn<int>(
@@ -540,9 +577,15 @@ class Categories extends Table with TableInfo<Categories, Category> {
       type: DriftSqlType.string,
       requiredDuringInsert: false,
       $customConstraints: '');
+  static const VerificationMeta _sortMeta = const VerificationMeta('sort');
+  late final GeneratedColumn<int> sort = GeneratedColumn<int>(
+      'sort', aliasedName, true,
+      type: DriftSqlType.int,
+      requiredDuringInsert: false,
+      $customConstraints: '');
   @override
   List<GeneratedColumn> get $columns =>
-      [id, name, categoryGroupId, description];
+      [id, name, categoryGroupId, description, sort];
   @override
   String get aliasedName => _alias ?? 'categories';
   @override
@@ -573,6 +616,10 @@ class Categories extends Table with TableInfo<Categories, Category> {
           description.isAcceptableOrUnknown(
               data['description']!, _descriptionMeta));
     }
+    if (data.containsKey('sort')) {
+      context.handle(
+          _sortMeta, sort.isAcceptableOrUnknown(data['sort']!, _sortMeta));
+    }
     return context;
   }
 
@@ -590,6 +637,8 @@ class Categories extends Table with TableInfo<Categories, Category> {
           .read(DriftSqlType.int, data['${effectivePrefix}category_group_id']),
       description: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}description']),
+      sort: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}sort']),
     );
   }
 
@@ -611,11 +660,13 @@ class Category extends DataClass implements Insertable<Category> {
   final String name;
   final int? categoryGroupId;
   final String? description;
+  final int? sort;
   const Category(
       {required this.id,
       required this.name,
       this.categoryGroupId,
-      this.description});
+      this.description,
+      this.sort});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -626,6 +677,9 @@ class Category extends DataClass implements Insertable<Category> {
     }
     if (!nullToAbsent || description != null) {
       map['description'] = Variable<String>(description);
+    }
+    if (!nullToAbsent || sort != null) {
+      map['sort'] = Variable<int>(sort);
     }
     return map;
   }
@@ -640,6 +694,7 @@ class Category extends DataClass implements Insertable<Category> {
       description: description == null && nullToAbsent
           ? const Value.absent()
           : Value(description),
+      sort: sort == null && nullToAbsent ? const Value.absent() : Value(sort),
     );
   }
 
@@ -651,6 +706,7 @@ class Category extends DataClass implements Insertable<Category> {
       name: serializer.fromJson<String>(json['name']),
       categoryGroupId: serializer.fromJson<int?>(json['category_group_id']),
       description: serializer.fromJson<String?>(json['description']),
+      sort: serializer.fromJson<int?>(json['sort']),
     );
   }
   @override
@@ -661,6 +717,7 @@ class Category extends DataClass implements Insertable<Category> {
       'name': serializer.toJson<String>(name),
       'category_group_id': serializer.toJson<int?>(categoryGroupId),
       'description': serializer.toJson<String?>(description),
+      'sort': serializer.toJson<int?>(sort),
     };
   }
 
@@ -668,7 +725,8 @@ class Category extends DataClass implements Insertable<Category> {
           {int? id,
           String? name,
           Value<int?> categoryGroupId = const Value.absent(),
-          Value<String?> description = const Value.absent()}) =>
+          Value<String?> description = const Value.absent(),
+          Value<int?> sort = const Value.absent()}) =>
       Category(
         id: id ?? this.id,
         name: name ?? this.name,
@@ -676,6 +734,7 @@ class Category extends DataClass implements Insertable<Category> {
             ? categoryGroupId.value
             : this.categoryGroupId,
         description: description.present ? description.value : this.description,
+        sort: sort.present ? sort.value : this.sort,
       );
   @override
   String toString() {
@@ -683,13 +742,14 @@ class Category extends DataClass implements Insertable<Category> {
           ..write('id: $id, ')
           ..write('name: $name, ')
           ..write('categoryGroupId: $categoryGroupId, ')
-          ..write('description: $description')
+          ..write('description: $description, ')
+          ..write('sort: $sort')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, name, categoryGroupId, description);
+  int get hashCode => Object.hash(id, name, categoryGroupId, description, sort);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -697,7 +757,8 @@ class Category extends DataClass implements Insertable<Category> {
           other.id == this.id &&
           other.name == this.name &&
           other.categoryGroupId == this.categoryGroupId &&
-          other.description == this.description);
+          other.description == this.description &&
+          other.sort == this.sort);
 }
 
 class CategoriesCompanion extends UpdateCompanion<Category> {
@@ -705,29 +766,34 @@ class CategoriesCompanion extends UpdateCompanion<Category> {
   final Value<String> name;
   final Value<int?> categoryGroupId;
   final Value<String?> description;
+  final Value<int?> sort;
   const CategoriesCompanion({
     this.id = const Value.absent(),
     this.name = const Value.absent(),
     this.categoryGroupId = const Value.absent(),
     this.description = const Value.absent(),
+    this.sort = const Value.absent(),
   });
   CategoriesCompanion.insert({
     this.id = const Value.absent(),
     required String name,
     this.categoryGroupId = const Value.absent(),
     this.description = const Value.absent(),
+    this.sort = const Value.absent(),
   }) : name = Value(name);
   static Insertable<Category> custom({
     Expression<int>? id,
     Expression<String>? name,
     Expression<int>? categoryGroupId,
     Expression<String>? description,
+    Expression<int>? sort,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (name != null) 'name': name,
       if (categoryGroupId != null) 'category_group_id': categoryGroupId,
       if (description != null) 'description': description,
+      if (sort != null) 'sort': sort,
     });
   }
 
@@ -735,12 +801,14 @@ class CategoriesCompanion extends UpdateCompanion<Category> {
       {Value<int>? id,
       Value<String>? name,
       Value<int?>? categoryGroupId,
-      Value<String?>? description}) {
+      Value<String?>? description,
+      Value<int?>? sort}) {
     return CategoriesCompanion(
       id: id ?? this.id,
       name: name ?? this.name,
       categoryGroupId: categoryGroupId ?? this.categoryGroupId,
       description: description ?? this.description,
+      sort: sort ?? this.sort,
     );
   }
 
@@ -759,6 +827,9 @@ class CategoriesCompanion extends UpdateCompanion<Category> {
     if (description.present) {
       map['description'] = Variable<String>(description.value);
     }
+    if (sort.present) {
+      map['sort'] = Variable<int>(sort.value);
+    }
     return map;
   }
 
@@ -768,7 +839,8 @@ class CategoriesCompanion extends UpdateCompanion<Category> {
           ..write('id: $id, ')
           ..write('name: $name, ')
           ..write('categoryGroupId: $categoryGroupId, ')
-          ..write('description: $description')
+          ..write('description: $description, ')
+          ..write('sort: $sort')
           ..write(')'))
         .toString();
   }
@@ -1671,6 +1743,28 @@ abstract class _$MainDatabase extends GeneratedDatabase {
         readsFrom: {
           accounts,
         }).map((QueryRow row) => row.read<int>('_c0'));
+  }
+
+  Selectable<Account> allAccounts() {
+    return customSelect('SELECT * FROM accounts', variables: [], readsFrom: {
+      accounts,
+    }).asyncMap(accounts.mapFromRow);
+  }
+
+  Selectable<Category> allCategories() {
+    return customSelect('SELECT * FROM categories ORDER BY sort ASC',
+        variables: [],
+        readsFrom: {
+          categories,
+        }).asyncMap(categories.mapFromRow);
+  }
+
+  Selectable<CategoryGroup> allCategoryGroups() {
+    return customSelect('SELECT * FROM category_groups ORDER BY sort ASC',
+        variables: [],
+        readsFrom: {
+          categoryGroups,
+        }).asyncMap(categoryGroups.mapFromRow);
   }
 
   @override
