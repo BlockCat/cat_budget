@@ -50,7 +50,7 @@ final GoRouter router =
                 appBar: AppBar(
                   title: const Text('Account Details'),
                 ),
-                body: Placeholder(),
+                body: const Placeholder(),
               ),
             ),
             GoRoute(
@@ -59,7 +59,7 @@ final GoRouter router =
                 appBar: AppBar(
                   title: const Text('Edit account'),
                 ),
-                body: Placeholder(),
+                body: const Placeholder(),
               ),
             ),
             GoRoute(
@@ -92,7 +92,7 @@ final GoRouter router =
                 appBar: AppBar(
                   title: const Text('Add transaction'),
                 ),
-                body: AddTransactionPage(),
+                body: const AddTransactionPage(),
               ),
             ),
             GoRoute(
@@ -101,7 +101,7 @@ final GoRouter router =
                 appBar: AppBar(
                   title: const Text('Edit transaction'),
                 ),
-                body: Placeholder(),
+                body: const Placeholder(),
               ),
             ),
           ],

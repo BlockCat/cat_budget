@@ -57,25 +57,25 @@ void main() {
                   ..where((tbl) => tbl.id.equals(category1Envelope1Id)))
                 .getSingle())
             .balance,
-        90.0);
+        9000);
     expect(
         (await (database.categoryEnvelopes.select()
                   ..where((tbl) => tbl.id.equals(category1Envelope2Id)))
                 .getSingle())
             .balance,
-        180.0);
+        18000);
     expect(
         (await (database.categoryEnvelopes.select()
                   ..where((tbl) => tbl.id.equals(category2Envelope1Id)))
                 .getSingle())
             .balance,
-        40.0);
+        4000);
     expect(
         (await (database.categoryEnvelopes.select()
                   ..where((tbl) => tbl.id.equals(category2Envelope2Id)))
                 .getSingle())
             .balance,
-        40.0);
+        4000);
   });
 
   test('envelope balance after transaction', () async {
@@ -85,36 +85,36 @@ void main() {
         .map((event) => event.balance);
 
     final envelope1Balance =
-        expectLater(envelope1BalanceStream, emitsInOrder([90, 45, -45]));
+        expectLater(envelope1BalanceStream, emitsInOrder([9000, 4500, -4500]));
     final envelope2Balance = expectLater(
         (database.categoryEnvelopes.select()
               ..where((tbl) => tbl.id.equals(category1Envelope2Id)))
             .watchSingle()
             .map((event) => event.balance),
-        emitsInOrder([180, 135, 90]));
+        emitsInOrder([18000, 13500, 9000]));
 
     var transactionId = await database.bankTransactions.insertOne(
         BankTransactionsCompanion.insert(
             accountId: accountId,
-            amount: -45,
+            amount: -4500,
             date: DateTime.utc(2023, 10, 15)));
 
     var transaction2Id = await database.bankTransactions.insertOne(
         BankTransactionsCompanion.insert(
             accountId: accountId,
-            amount: -90,
+            amount: -9000,
             date: DateTime.utc(2023, 10, 15)));
 
     await database.bankTransactionCategory.insertOne(
         BankTransactionCategoryCompanion.insert(
             bankTransactionId: transactionId,
             categoryId: category1Id,
-            amount: -45));
+            amount: -4500));
     await database.bankTransactionCategory.insertOne(
         BankTransactionCategoryCompanion.insert(
             bankTransactionId: transaction2Id,
             categoryId: category1Id,
-            amount: -90));
+            amount: -9000));
     await envelope1Balance;
     await envelope2Balance;
   });

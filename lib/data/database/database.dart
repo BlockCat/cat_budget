@@ -1,13 +1,14 @@
+import 'package:cat_budget/data/dao/category_dao.dart';
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 
 part 'database.g.dart';
 
-@DriftDatabase(
-  include: {
-    '../models/schema.drift',
-  },
-)
+@DriftDatabase(include: {
+  '../models/schema.drift',
+}, daos: [
+  CategoryDao
+])
 class MainDatabase extends _$MainDatabase {
   // This example creates a simple in-memory database (without actual
   // persistence).

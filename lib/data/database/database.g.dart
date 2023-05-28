@@ -1737,6 +1737,7 @@ abstract class _$MainDatabase extends GeneratedDatabase {
   late final Trigger transactionDeletedUpdateAccount = Trigger(
       'CREATE TRIGGER IF NOT EXISTS transaction_deleted_update_account AFTER DELETE ON bank_transactions BEGIN UPDATE accounts SET balance = balance - OLD.amount WHERE id = OLD.account_id;END',
       'transaction_deleted_update_account');
+  late final CategoryDao categoryDao = CategoryDao(this as MainDatabase);
   Selectable<int> moneyInBank() {
     return customSelect('SELECT SUM(balance) AS _c0 FROM accounts',
         variables: [],

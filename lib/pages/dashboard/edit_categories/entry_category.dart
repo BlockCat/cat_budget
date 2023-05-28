@@ -1,3 +1,4 @@
+import 'package:cat_budget/data/dao/category_dao.dart';
 import 'package:cat_budget/pages/dashboard/edit_categories/edit_category.dart';
 import 'package:drag_and_drop_lists/drag_and_drop_lists.dart';
 import 'package:flutter/material.dart';
@@ -23,12 +24,14 @@ class CategoryEntryWidget extends StatelessWidget {
         children: [
           Column(
             children: [
-              Text(child.name.value,
+              Text(child.category.name.value,
                   style: child.deleted
                       ? const TextStyle(decoration: TextDecoration.lineThrough)
                       : null),
-              if (child.description.present && child.description.value != null)
-                Text(child.description.value!, style: subtitleTextStyle),
+              if (child.category.description.present &&
+                  child.category.description.value != null)
+                Text(child.category.description.value!,
+                    style: subtitleTextStyle),
             ],
           ),
           const Spacer(),

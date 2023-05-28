@@ -1,3 +1,4 @@
+import 'package:cat_budget/data/dao/category_dao.dart';
 import 'package:cat_budget/pages/dashboard/edit_categories/edit_category.dart';
 import 'package:flutter/material.dart';
 
@@ -26,12 +27,12 @@ class CategoryGroupEntryWidget extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                categoryTree.group.name.value,
+                categoryTree.group.group.name.value,
                 style: const TextStyle(fontSize: 15, color: Colors.white),
               ),
-              if (categoryTree.group.description.present)
+              if (categoryTree.group.group.description.present)
                 Text(
-                  categoryTree.group.description.value!,
+                  categoryTree.group.group.description.value!,
                   style: subtitleTextStyle.copyWith(color: Colors.white),
                 ),
             ],
@@ -46,7 +47,7 @@ class CategoryGroupEntryWidget extends StatelessWidget {
   List<Widget> _buildButtons() {
     if (categoryTree.group.deleted) {
       return [
-         IconButton(
+        IconButton(
           icon: const Icon(Icons.auto_delete),
           onPressed: () => onDeleteCategoryGroupPressed?.call(categoryTree),
           color: Colors.white,

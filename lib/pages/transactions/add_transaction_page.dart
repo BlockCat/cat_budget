@@ -1,15 +1,5 @@
 import 'package:flutter/material.dart';
 
-/**
- * A page for adding a transaction.
- * Has a form for adding a transaction.
- * Selects the account to add the transaction to.
- * Selects the category to add the transaction to, can be null.
- * Selects the date of the transaction.
- * Selects the amount of the transaction.
- * Selects the description of the transaction.
- * Selects the type of the transaction, outflow or inflow.
- */
 class AddTransactionPage extends StatelessWidget {
   const AddTransactionPage({Key? key}) : super(key: key);
 
