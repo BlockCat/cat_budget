@@ -3,6 +3,7 @@ import 'package:cat_budget/data/database/database.dart';
 import 'package:cat_budget/pages/dashboard/edit_categories/edit_category_state.dart';
 import 'package:cat_budget/pages/dashboard/edit_categories/entry_category.dart';
 import 'package:cat_budget/pages/dashboard/edit_categories/entry_group_category.dart';
+import 'package:cat_budget/widgets/category/category_edit_modal.dart';
 import 'package:drift/drift.dart' as drift;
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -146,8 +147,9 @@ class _CategoryListEditorState extends State<CategoryListEditor> {
   }
 
   void _onAddCategoryPressed(CategoryTree categoryTree) async {
-    TempCategory category = await _openEditCategoryModal(null, categoryTree);
+    TempCategory? category = await _openEditCategoryModal(null, categoryTree);
 
+    if (category == null) return;
     if (category.category.name.value.isEmpty) return;
 
     setState(() {
@@ -157,11 +159,13 @@ class _CategoryListEditorState extends State<CategoryListEditor> {
 
   _onEditCategoryPressed(
       CategoryTree categoryTree, TempCategory child, int childIndex) async {
-    TempCategory category = await _openEditCategoryModal(child, categoryTree);
+    TempCategory? category = await _openEditCategoryModal(child, categoryTree);
 
-    setState(() {
-      state = state.updateCategory(categoryTree, category);
-    });
+    if (category != null) {
+      setState(() {
+        state = state.updateCategory(categoryTree, category);
+      });
+    }
   }
 
   _onDeleteCategoryPressed(
@@ -178,72 +182,41 @@ class _CategoryListEditorState extends State<CategoryListEditor> {
     }
   }
 
-  Future<TempCategory> _openEditCategoryModal(
+  Future<TempCategory?> _openEditCategoryModal(
       TempCategory? category, CategoryTree categoryTree) async {
-    final nameController =
-        TextEditingController(text: category?.category.name.value);
-    final descriptionController =
-        TextEditingController(text: category?.category.description.value);
-    await showModalBottomSheet(
+    final result = await showModalBottomSheet<TempCategory?>(
       context: context,
       isScrollControlled: true,
-      builder: (context) {
-        return Container(
-          padding: const EdgeInsets.all(10),
-          // height: 210,
-          child: Column(
-            children: [
-              const Text("Edit Category", style: TextStyle(fontSize: 20)),
-              Divider(color: Colors.grey[400]),
-              TextFormField(
-                decoration: const InputDecoration(labelText: "Name"),
-                autocorrect: true,
-                autofocus: true,
-                controller: nameController,
-              ),
-              TextFormField(
-                  decoration: const InputDecoration(labelText: "Description"),
-                  autocorrect: true,
-                  controller: descriptionController),
-              Container(
-                padding: const EdgeInsets.all(10),
-                child: ElevatedButton(
-                  onPressed: () {
-                    context.pop();
-                  },
-                  child: const Text("Close"),
+      builder: (context) => CategoryEditModal(
+          key: const Key("category-edit-modal"),
+          category: category,
+          onClose: () => context.pop(null),
+          onSave: (name, description) {
+            if (category == null) {
+              return context.pop(TempCategory(
+                key: UniqueKey(),
+                category: CategoriesCompanion.insert(
+                  name: name,
+                  description: description == null
+                      ? const drift.Value.absent()
+                      : drift.Value(description),
                 ),
-              ),
-            ],
-          ),
-        );
-      },
+              ));
+            }
+            return Navigator.pop(
+                context,
+                category.copyWith(
+                  category: category.category.copyWith(
+                    name: drift.Value(name),
+                    description: description == null
+                        ? const drift.Value.absent()
+                        : drift.Value(description),
+                  ),
+                ));
+          }),
     );
 
-    if (category == null) {
-      return TempCategory(
-        key: const Key('unused-key'),
-        category: CategoriesCompanion.insert(
-          name: nameController.text,
-          description: descriptionController.text.isEmpty
-              ? const drift.Value.absent()
-              : drift.Value(descriptionController.text),
-        ),
-        added: true,
-      );
-    }
-
-    return TempCategory(
-      key: category.key,
-      category: category.category.copyWith(
-        name: drift.Value(nameController.text),
-        description: descriptionController.text.isEmpty
-            ? const drift.Value.absent()
-            : drift.Value(descriptionController.text),
-      ),
-      added: category.added,
-      deleted: category.deleted,
-    );
+    return result;
   }
 
   void _onDeleteCategoryGroupPressed(BuildContext context, int groupIndex) {

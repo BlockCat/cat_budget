@@ -163,18 +163,13 @@ class TempCategory extends Equatable {
 
   TempCategory copyWith({
     Key? key,
-    String? name,
-    String? description,
+    CategoriesCompanion? category,
     bool? deleted,
     bool? added,
   }) {
     return TempCategory(
       key: key ?? this.key,
-      category: category.copyWith(
-        name: name != null ? Value(name) : category.name,
-        description:
-            description != null ? Value(description) : category.description,
-      ),
+      category: category ?? this.category,
       deleted: deleted ?? this.deleted,
       added: added ?? this.added,
     );
