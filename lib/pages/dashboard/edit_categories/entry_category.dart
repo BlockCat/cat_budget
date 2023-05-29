@@ -34,7 +34,9 @@ class CategoryEntryWidget extends StatelessWidget {
                     style: subtitleTextStyle),
             ],
           ),
-          const Spacer(),
+          const Spacer(
+            flex: 2,
+          ),
           ..._createButtons(),
           ReorderableDragStartListener(
             index: index,

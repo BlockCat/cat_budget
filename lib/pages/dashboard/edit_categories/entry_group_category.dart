@@ -17,29 +17,31 @@ class CategoryGroupEntryWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return Card(
       color: const Color.fromARGB(255, 65, 146, 102),
-      padding: const EdgeInsets.fromLTRB(3, 1, 0, 1),
-      child: Row(
-        children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                categoryTree.group.group.name.value,
-                style: const TextStyle(fontSize: 15, color: Colors.white),
-              ),
-              if (categoryTree.group.group.description.present)
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+        child: Row(
+          children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
                 Text(
-                  categoryTree.group.group.description.value!,
-                  style: subtitleTextStyle.copyWith(color: Colors.white),
+                  categoryTree.group.group.name.value,
+                  style: const TextStyle(fontSize: 15, color: Colors.white),
                 ),
-            ],
-          ),
-          const Spacer(),
-          ..._buildButtons()
-        ],
+                if (categoryTree.group.group.description.present)
+                  Text(
+                    categoryTree.group.group.description.value!,
+                    style: subtitleTextStyle.copyWith(color: Colors.white),
+                  ),
+              ],
+            ),
+            const Spacer(),
+            ..._buildButtons()
+          ],
+        ),
       ),
     );
   }

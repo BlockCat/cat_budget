@@ -191,16 +191,17 @@ class _CategoryListEditorState extends State<CategoryListEditor> {
           key: const Key("category-edit-modal"),
           category: category,
           onClose: () => context.pop(null),
-          onSave: (name, description) {
+          onSave: (name, description, budgetData) {
+            print('help: ${budgetData.type}');
             if (category == null) {
               return context.pop(TempCategory(
                 key: UniqueKey(),
                 category: CategoriesCompanion.insert(
-                  name: name,
-                  description: description == null
-                      ? const drift.Value.absent()
-                      : drift.Value(description),
-                ),
+                    name: name,
+                    description: description == null
+                        ? const drift.Value.absent()
+                        : drift.Value(description),
+                    budgetData: drift.Value(budgetData)),
               ));
             }
             return Navigator.pop(
@@ -211,6 +212,7 @@ class _CategoryListEditorState extends State<CategoryListEditor> {
                     description: description == null
                         ? const drift.Value.absent()
                         : drift.Value(description),
+                    budgetData: drift.Value(budgetData),
                   ),
                 ));
           }),

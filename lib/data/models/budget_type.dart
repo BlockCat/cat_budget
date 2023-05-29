@@ -12,7 +12,7 @@ abstract class BudgetData {
   BudgetType get type;
 
   factory BudgetData.fromJson(Map<String, dynamic> json) {
-    switch (json['type'] as String) {
+    switch (json['type'] as String?) {
       case 'envelope':
         return EnvelopeBudgetData();
       case 'monthly':
@@ -20,7 +20,7 @@ abstract class BudgetData {
       case 'target':
         return TargetBudgetData.fromJson(json);
       default:
-        throw ArgumentError.value(json['type'], 'type', 'Invalid type');
+        return EnvelopeBudgetData();
     }
   }
 

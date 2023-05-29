@@ -1,4 +1,5 @@
 import 'package:cat_budget/data/dao/category_dao.dart';
+import 'package:cat_budget/data/models/budget_type.dart';
 import 'package:cat_budget/widgets/category/budget_type_selection.dart';
 import 'package:flutter/material.dart';
 
@@ -6,8 +7,10 @@ class CategoryEditModal extends StatelessWidget {
   final TempCategory? category;
   final TextEditingController _nameController;
   final TextEditingController _descriptionController;
+  final ValueNotifier<BudgetData> _budgetDataController;
   final Function()? onClose;
-  final Function(String name, String? description)? onSave;
+  final Function(String name, String? description, BudgetData budgetData)?
+      onSave;
 
   CategoryEditModal({
     super.key,
@@ -17,7 +20,9 @@ class CategoryEditModal extends StatelessWidget {
   })  : _nameController =
             TextEditingController(text: category?.category.name.value),
         _descriptionController =
-            TextEditingController(text: category?.category.description.value);
+            TextEditingController(text: category?.category.description.value),
+        _budgetDataController = ValueNotifier(
+            category?.category.budgetData.value ?? EnvelopeBudgetData());
 
   @override
   Widget build(BuildContext context) {
@@ -39,7 +44,7 @@ class CategoryEditModal extends StatelessWidget {
             controller: _descriptionController,
           ),
           Divider(color: Colors.grey[400]),
-          BudgetTypeSelection(budgetData: category?.category.budgetData.value),
+          BudgetTypeSelection(budgetDataController: _budgetDataController),
           Divider(color: Colors.grey[400]),
           Container(
             padding: const EdgeInsets.all(10),
@@ -53,9 +58,11 @@ class CategoryEditModal extends StatelessWidget {
                 ),
                 ElevatedButton(
                   onPressed: () {
+                    print("help2: ${_budgetDataController.value.type}");
                     onSave?.call(
                       _nameController.text,
                       _descriptionController.text,
+                      _budgetDataController.value,
                     );
                   },
                   child: const Text("Save"),

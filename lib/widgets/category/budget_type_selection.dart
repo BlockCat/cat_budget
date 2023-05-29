@@ -1,17 +1,68 @@
 import 'package:cat_budget/data/models/budget_type.dart';
+import 'package:cat_budget/widgets/money_form_field.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class BudgetTypeSelection extends StatefulWidget {
-  final BudgetData? budgetData;
+  final ValueNotifier<BudgetData> budgetDataController;
+  final ValueChanged<BudgetData>? onBudgetDataChanged;
 
-  const BudgetTypeSelection({super.key, this.budgetData});
+  const BudgetTypeSelection(
+      {super.key,
+      required this.budgetDataController,
+      this.onBudgetDataChanged});
 
   @override
   State<StatefulWidget> createState() => _BudgetTypeSelectionState();
 }
 
 class _BudgetTypeSelectionState extends State<BudgetTypeSelection> {
-  BudgetType _budgetType = BudgetType.envelope;
+  late BudgetType _budgetType;
+  int _money = 0;
+  DateTime _targetDate = DateTime.now();
+
+  @override
+  void initState() {
+    super.initState();
+    print(widget.budgetDataController.value.toJson());
+    _budgetType = widget.budgetDataController.value.type;
+    if (_budgetType == BudgetType.monthly) {
+      _money = (widget.budgetDataController.value as MonthlyBudgetData)
+          .monthlyAmount;
+    } else if (_budgetType == BudgetType.target) {
+      _money =
+          (widget.budgetDataController.value as TargetBudgetData).targetAmount;
+      _targetDate = (widget.budgetDataController.value as TargetBudgetData)
+          .targetDate
+          .toLocal();
+    }
+  }
+
+  @override
+  void setState(VoidCallback fn) {
+    super.setState(() {
+      fn();
+      final data = budgetData();
+      if (widget.onBudgetDataChanged != null) {
+        widget.onBudgetDataChanged!(data);
+      }
+      widget.budgetDataController.value = data;
+    });
+  }
+
+  BudgetData budgetData() {
+    switch (_budgetType) {
+      case BudgetType.envelope:
+        return EnvelopeBudgetData();
+      case BudgetType.monthly:
+        return MonthlyBudgetData(_money);
+      case BudgetType.target:
+        return TargetBudgetData(
+          targetAmount: _money,
+          targetDate: _targetDate.toUtc(),
+        );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -47,8 +98,25 @@ class _BudgetTypeSelectionState extends State<BudgetTypeSelection> {
         ],
         emptySelectionAllowed: false,
         selectedIcon: const Icon(Icons.check),
-        onSelectionChanged: (selection) =>
-            setState(() => _budgetType = selection.first!),
+        onSelectionChanged: (selection) {
+          if (selection.isEmpty) return;
+          setState(() {
+            _budgetType = selection.first;
+          });
+
+          switch (selection.first) {
+            case BudgetType.envelope:
+              widget.budgetDataController.value = EnvelopeBudgetData();
+              break;
+            case BudgetType.monthly:
+              widget.budgetDataController.value = MonthlyBudgetData(_money);
+              break;
+            case BudgetType.target:
+              widget.budgetDataController.value = TargetBudgetData(
+                  targetAmount: _money, targetDate: _targetDate.toUtc());
+              break;
+          }
+        },
         selected: {_budgetType});
   }
 
@@ -76,11 +144,22 @@ class _BudgetTypeSelectionState extends State<BudgetTypeSelection> {
       child: Column(
         children: [
           const Text("You set a monthly budget for the category"),
-          TextFormField(
+          MoneyFormField(
+            initialValue: _money,
             decoration: const InputDecoration(labelText: "Monthly Budget"),
-            autocorrect: true,
+            style: const TextStyle(
+                fontSize: 40,
+                fontStyle: FontStyle.italic,
+                color: Color.fromARGB(255, 82, 79, 79),
+                fontWeight: FontWeight.w800),
             autofocus: true,
-            initialValue: "0",
+            textAlign: TextAlign.center,
+            allowNegative: true,
+            onChanged: (value) {
+              setState(() {
+                _money = value;
+              });
+            },
           ),
         ],
       ),
@@ -88,22 +167,58 @@ class _BudgetTypeSelectionState extends State<BudgetTypeSelection> {
   }
 
   _buildTargetConfiguration() {
+    final now = DateTime.now();
+    final monthsLeft =
+        (_targetDate.year - now.year) * 12 + _targetDate.month - now.month;
+
     return Container(
       padding: const EdgeInsets.all(10),
       child: Column(
         children: [
           const Text("You set a target amount for the category"),
-          TextFormField(
+          MoneyFormField(
+            initialValue: _money,
             decoration: const InputDecoration(labelText: "Target Amount"),
-            autocorrect: true,
+            style: const TextStyle(
+                fontSize: 40,
+                fontStyle: FontStyle.italic,
+                color: Color.fromARGB(255, 82, 79, 79),
+                fontWeight: FontWeight.w800),
             autofocus: true,
-            initialValue: "0",
+            textAlign: TextAlign.center,
+            allowNegative: false,
+            onChanged: (value) {
+              setState(() {
+                print("Value: $value");
+                _money = value;
+              });
+            },
           ),
-          CalendarDatePicker(
-              initialDate: DateTime.now(),
-              firstDate: DateTime(2000),
-              lastDate: DateTime.now().add(const Duration(days: 365 * 100)),
-              onDateChanged: (date) {})
+          Column(
+            children: [
+              TextFormField(
+                initialValue: DateFormat.yMd().format(_targetDate),
+                decoration: const InputDecoration(labelText: "Target Date"),
+                readOnly: true,
+                onTap: () => showDatePicker(
+                  context: context,
+                  initialDate: _targetDate,
+                  lastDate: DateTime.now().add(const Duration(days: 365 * 50)),
+                  firstDate: DateTime.now(),
+                ).then((value) {
+                  if (value == null) return;
+                  setState(() {
+                    _targetDate = value;
+                  });
+                }),
+              ),
+              Text(
+                monthsLeft == 0
+                    ? "Target reached this month"
+                    : "Monthly Budget: ${numberFormatter.format((_money / monthsLeft).ceil() / 100.0)}",
+              ),
+            ],
+          ),
         ],
       ),
     );
