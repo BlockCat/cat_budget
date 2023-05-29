@@ -94,16 +94,18 @@ void main() {
         emitsInOrder([18000, 13500, 9000]));
 
     var transactionId = await database.bankTransactions.insertOne(
-        BankTransactionsCompanion.insert(
-            accountId: accountId,
-            amount: -4500,
-            date: DateTime.utc(2023, 10, 15)));
+      BankTransactionsCompanion.insert(
+          accountId: accountId,
+          amount: -4500,
+          date: Value(DateTime.utc(2023, 10, 15))),
+    );
 
     var transaction2Id = await database.bankTransactions.insertOne(
-        BankTransactionsCompanion.insert(
-            accountId: accountId,
-            amount: -9000,
-            date: DateTime.utc(2023, 10, 15)));
+      BankTransactionsCompanion.insert(
+          accountId: accountId,
+          amount: -9000,
+          date: Value(DateTime.utc(2023, 10, 15))),
+    );
 
     await database.bankTransactionCategory.insertOne(
         BankTransactionCategoryCompanion.insert(

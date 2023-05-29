@@ -1,4 +1,6 @@
 import 'package:cat_budget/data/dao/category_dao.dart';
+import 'package:cat_budget/data/models/budget_type.dart';
+import 'package:cat_budget/data/models/budget_type_converter.dart';
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 

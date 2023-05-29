@@ -318,6 +318,13 @@ class CategoryGroups extends Table
       type: DriftSqlType.int,
       requiredDuringInsert: false,
       $customConstraints: '');
+  static const VerificationMeta _hiddenMeta = const VerificationMeta('hidden');
+  late final GeneratedColumn<bool> hidden = GeneratedColumn<bool>(
+      'hidden', aliasedName, false,
+      type: DriftSqlType.bool,
+      requiredDuringInsert: false,
+      $customConstraints: 'NOT NULL DEFAULT 0',
+      defaultValue: const CustomExpression('0'));
   static const VerificationMeta _descriptionMeta =
       const VerificationMeta('description');
   late final GeneratedColumn<String> description = GeneratedColumn<String>(
@@ -326,7 +333,7 @@ class CategoryGroups extends Table
       requiredDuringInsert: false,
       $customConstraints: '');
   @override
-  List<GeneratedColumn> get $columns => [id, name, sort, description];
+  List<GeneratedColumn> get $columns => [id, name, sort, hidden, description];
   @override
   String get aliasedName => _alias ?? 'category_groups';
   @override
@@ -349,6 +356,10 @@ class CategoryGroups extends Table
       context.handle(
           _sortMeta, sort.isAcceptableOrUnknown(data['sort']!, _sortMeta));
     }
+    if (data.containsKey('hidden')) {
+      context.handle(_hiddenMeta,
+          hidden.isAcceptableOrUnknown(data['hidden']!, _hiddenMeta));
+    }
     if (data.containsKey('description')) {
       context.handle(
           _descriptionMeta,
@@ -370,6 +381,8 @@ class CategoryGroups extends Table
           .read(DriftSqlType.string, data['${effectivePrefix}name'])!,
       sort: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}sort']),
+      hidden: attachedDatabase.typeMapping
+          .read(DriftSqlType.bool, data['${effectivePrefix}hidden'])!,
       description: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}description']),
     );
@@ -388,9 +401,14 @@ class CategoryGroup extends DataClass implements Insertable<CategoryGroup> {
   final int id;
   final String name;
   final int? sort;
+  final bool hidden;
   final String? description;
   const CategoryGroup(
-      {required this.id, required this.name, this.sort, this.description});
+      {required this.id,
+      required this.name,
+      this.sort,
+      required this.hidden,
+      this.description});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -399,6 +417,7 @@ class CategoryGroup extends DataClass implements Insertable<CategoryGroup> {
     if (!nullToAbsent || sort != null) {
       map['sort'] = Variable<int>(sort);
     }
+    map['hidden'] = Variable<bool>(hidden);
     if (!nullToAbsent || description != null) {
       map['description'] = Variable<String>(description);
     }
@@ -410,6 +429,7 @@ class CategoryGroup extends DataClass implements Insertable<CategoryGroup> {
       id: Value(id),
       name: Value(name),
       sort: sort == null && nullToAbsent ? const Value.absent() : Value(sort),
+      hidden: Value(hidden),
       description: description == null && nullToAbsent
           ? const Value.absent()
           : Value(description),
@@ -423,6 +443,7 @@ class CategoryGroup extends DataClass implements Insertable<CategoryGroup> {
       id: serializer.fromJson<int>(json['id']),
       name: serializer.fromJson<String>(json['name']),
       sort: serializer.fromJson<int?>(json['sort']),
+      hidden: serializer.fromJson<bool>(json['hidden']),
       description: serializer.fromJson<String?>(json['description']),
     );
   }
@@ -433,6 +454,7 @@ class CategoryGroup extends DataClass implements Insertable<CategoryGroup> {
       'id': serializer.toJson<int>(id),
       'name': serializer.toJson<String>(name),
       'sort': serializer.toJson<int?>(sort),
+      'hidden': serializer.toJson<bool>(hidden),
       'description': serializer.toJson<String?>(description),
     };
   }
@@ -441,11 +463,13 @@ class CategoryGroup extends DataClass implements Insertable<CategoryGroup> {
           {int? id,
           String? name,
           Value<int?> sort = const Value.absent(),
+          bool? hidden,
           Value<String?> description = const Value.absent()}) =>
       CategoryGroup(
         id: id ?? this.id,
         name: name ?? this.name,
         sort: sort.present ? sort.value : this.sort,
+        hidden: hidden ?? this.hidden,
         description: description.present ? description.value : this.description,
       );
   @override
@@ -454,13 +478,14 @@ class CategoryGroup extends DataClass implements Insertable<CategoryGroup> {
           ..write('id: $id, ')
           ..write('name: $name, ')
           ..write('sort: $sort, ')
+          ..write('hidden: $hidden, ')
           ..write('description: $description')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, name, sort, description);
+  int get hashCode => Object.hash(id, name, sort, hidden, description);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -468,6 +493,7 @@ class CategoryGroup extends DataClass implements Insertable<CategoryGroup> {
           other.id == this.id &&
           other.name == this.name &&
           other.sort == this.sort &&
+          other.hidden == this.hidden &&
           other.description == this.description);
 }
 
@@ -475,29 +501,34 @@ class CategoryGroupsCompanion extends UpdateCompanion<CategoryGroup> {
   final Value<int> id;
   final Value<String> name;
   final Value<int?> sort;
+  final Value<bool> hidden;
   final Value<String?> description;
   const CategoryGroupsCompanion({
     this.id = const Value.absent(),
     this.name = const Value.absent(),
     this.sort = const Value.absent(),
+    this.hidden = const Value.absent(),
     this.description = const Value.absent(),
   });
   CategoryGroupsCompanion.insert({
     this.id = const Value.absent(),
     required String name,
     this.sort = const Value.absent(),
+    this.hidden = const Value.absent(),
     this.description = const Value.absent(),
   }) : name = Value(name);
   static Insertable<CategoryGroup> custom({
     Expression<int>? id,
     Expression<String>? name,
     Expression<int>? sort,
+    Expression<bool>? hidden,
     Expression<String>? description,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (name != null) 'name': name,
       if (sort != null) 'sort': sort,
+      if (hidden != null) 'hidden': hidden,
       if (description != null) 'description': description,
     });
   }
@@ -506,11 +537,13 @@ class CategoryGroupsCompanion extends UpdateCompanion<CategoryGroup> {
       {Value<int>? id,
       Value<String>? name,
       Value<int?>? sort,
+      Value<bool>? hidden,
       Value<String?>? description}) {
     return CategoryGroupsCompanion(
       id: id ?? this.id,
       name: name ?? this.name,
       sort: sort ?? this.sort,
+      hidden: hidden ?? this.hidden,
       description: description ?? this.description,
     );
   }
@@ -527,6 +560,9 @@ class CategoryGroupsCompanion extends UpdateCompanion<CategoryGroup> {
     if (sort.present) {
       map['sort'] = Variable<int>(sort.value);
     }
+    if (hidden.present) {
+      map['hidden'] = Variable<bool>(hidden.value);
+    }
     if (description.present) {
       map['description'] = Variable<String>(description.value);
     }
@@ -539,6 +575,7 @@ class CategoryGroupsCompanion extends UpdateCompanion<CategoryGroup> {
           ..write('id: $id, ')
           ..write('name: $name, ')
           ..write('sort: $sort, ')
+          ..write('hidden: $hidden, ')
           ..write('description: $description')
           ..write(')'))
         .toString();
@@ -577,15 +614,30 @@ class Categories extends Table with TableInfo<Categories, Category> {
       type: DriftSqlType.string,
       requiredDuringInsert: false,
       $customConstraints: '');
+  static const VerificationMeta _hiddenMeta = const VerificationMeta('hidden');
+  late final GeneratedColumn<bool> hidden = GeneratedColumn<bool>(
+      'hidden', aliasedName, false,
+      type: DriftSqlType.bool,
+      requiredDuringInsert: false,
+      $customConstraints: 'NOT NULL DEFAULT 0',
+      defaultValue: const CustomExpression('0'));
   static const VerificationMeta _sortMeta = const VerificationMeta('sort');
   late final GeneratedColumn<int> sort = GeneratedColumn<int>(
       'sort', aliasedName, true,
       type: DriftSqlType.int,
       requiredDuringInsert: false,
       $customConstraints: '');
+  static const VerificationMeta _budgetDataMeta =
+      const VerificationMeta('budgetData');
+  late final GeneratedColumnWithTypeConverter<BudgetData?, String> budgetData =
+      GeneratedColumn<String>('budget_data', aliasedName, true,
+              type: DriftSqlType.string,
+              requiredDuringInsert: false,
+              $customConstraints: '')
+          .withConverter<BudgetData?>(Categories.$converterbudgetDatan);
   @override
   List<GeneratedColumn> get $columns =>
-      [id, name, categoryGroupId, description, sort];
+      [id, name, categoryGroupId, description, hidden, sort, budgetData];
   @override
   String get aliasedName => _alias ?? 'categories';
   @override
@@ -616,10 +668,15 @@ class Categories extends Table with TableInfo<Categories, Category> {
           description.isAcceptableOrUnknown(
               data['description']!, _descriptionMeta));
     }
+    if (data.containsKey('hidden')) {
+      context.handle(_hiddenMeta,
+          hidden.isAcceptableOrUnknown(data['hidden']!, _hiddenMeta));
+    }
     if (data.containsKey('sort')) {
       context.handle(
           _sortMeta, sort.isAcceptableOrUnknown(data['sort']!, _sortMeta));
     }
+    context.handle(_budgetDataMeta, const VerificationResult.success());
     return context;
   }
 
@@ -637,8 +694,13 @@ class Categories extends Table with TableInfo<Categories, Category> {
           .read(DriftSqlType.int, data['${effectivePrefix}category_group_id']),
       description: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}description']),
+      hidden: attachedDatabase.typeMapping
+          .read(DriftSqlType.bool, data['${effectivePrefix}hidden'])!,
       sort: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}sort']),
+      budgetData: Categories.$converterbudgetDatan.fromSql(attachedDatabase
+          .typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}budget_data'])),
     );
   }
 
@@ -647,6 +709,10 @@ class Categories extends Table with TableInfo<Categories, Category> {
     return Categories(attachedDatabase, alias);
   }
 
+  static TypeConverter<BudgetData, String> $converterbudgetData =
+      const BudgetTypeConverter();
+  static TypeConverter<BudgetData?, String?> $converterbudgetDatan =
+      NullAwareTypeConverter.wrap($converterbudgetData);
   @override
   List<String> get customConstraints => const [
         'FOREIGN KEY(category_group_id)REFERENCES category_groups(id)ON DELETE SET NULL'
@@ -660,13 +726,17 @@ class Category extends DataClass implements Insertable<Category> {
   final String name;
   final int? categoryGroupId;
   final String? description;
+  final bool hidden;
   final int? sort;
+  final BudgetData? budgetData;
   const Category(
       {required this.id,
       required this.name,
       this.categoryGroupId,
       this.description,
-      this.sort});
+      required this.hidden,
+      this.sort,
+      this.budgetData});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -678,8 +748,13 @@ class Category extends DataClass implements Insertable<Category> {
     if (!nullToAbsent || description != null) {
       map['description'] = Variable<String>(description);
     }
+    map['hidden'] = Variable<bool>(hidden);
     if (!nullToAbsent || sort != null) {
       map['sort'] = Variable<int>(sort);
+    }
+    if (!nullToAbsent || budgetData != null) {
+      final converter = Categories.$converterbudgetDatan;
+      map['budget_data'] = Variable<String>(converter.toSql(budgetData));
     }
     return map;
   }
@@ -694,7 +769,11 @@ class Category extends DataClass implements Insertable<Category> {
       description: description == null && nullToAbsent
           ? const Value.absent()
           : Value(description),
+      hidden: Value(hidden),
       sort: sort == null && nullToAbsent ? const Value.absent() : Value(sort),
+      budgetData: budgetData == null && nullToAbsent
+          ? const Value.absent()
+          : Value(budgetData),
     );
   }
 
@@ -706,7 +785,9 @@ class Category extends DataClass implements Insertable<Category> {
       name: serializer.fromJson<String>(json['name']),
       categoryGroupId: serializer.fromJson<int?>(json['category_group_id']),
       description: serializer.fromJson<String?>(json['description']),
+      hidden: serializer.fromJson<bool>(json['hidden']),
       sort: serializer.fromJson<int?>(json['sort']),
+      budgetData: serializer.fromJson<BudgetData?>(json['budget_data']),
     );
   }
   @override
@@ -717,7 +798,9 @@ class Category extends DataClass implements Insertable<Category> {
       'name': serializer.toJson<String>(name),
       'category_group_id': serializer.toJson<int?>(categoryGroupId),
       'description': serializer.toJson<String?>(description),
+      'hidden': serializer.toJson<bool>(hidden),
       'sort': serializer.toJson<int?>(sort),
+      'budget_data': serializer.toJson<BudgetData?>(budgetData),
     };
   }
 
@@ -726,7 +809,9 @@ class Category extends DataClass implements Insertable<Category> {
           String? name,
           Value<int?> categoryGroupId = const Value.absent(),
           Value<String?> description = const Value.absent(),
-          Value<int?> sort = const Value.absent()}) =>
+          bool? hidden,
+          Value<int?> sort = const Value.absent(),
+          Value<BudgetData?> budgetData = const Value.absent()}) =>
       Category(
         id: id ?? this.id,
         name: name ?? this.name,
@@ -734,7 +819,9 @@ class Category extends DataClass implements Insertable<Category> {
             ? categoryGroupId.value
             : this.categoryGroupId,
         description: description.present ? description.value : this.description,
+        hidden: hidden ?? this.hidden,
         sort: sort.present ? sort.value : this.sort,
+        budgetData: budgetData.present ? budgetData.value : this.budgetData,
       );
   @override
   String toString() {
@@ -743,13 +830,16 @@ class Category extends DataClass implements Insertable<Category> {
           ..write('name: $name, ')
           ..write('categoryGroupId: $categoryGroupId, ')
           ..write('description: $description, ')
-          ..write('sort: $sort')
+          ..write('hidden: $hidden, ')
+          ..write('sort: $sort, ')
+          ..write('budgetData: $budgetData')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, name, categoryGroupId, description, sort);
+  int get hashCode => Object.hash(
+      id, name, categoryGroupId, description, hidden, sort, budgetData);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -758,7 +848,9 @@ class Category extends DataClass implements Insertable<Category> {
           other.name == this.name &&
           other.categoryGroupId == this.categoryGroupId &&
           other.description == this.description &&
-          other.sort == this.sort);
+          other.hidden == this.hidden &&
+          other.sort == this.sort &&
+          other.budgetData == this.budgetData);
 }
 
 class CategoriesCompanion extends UpdateCompanion<Category> {
@@ -766,34 +858,44 @@ class CategoriesCompanion extends UpdateCompanion<Category> {
   final Value<String> name;
   final Value<int?> categoryGroupId;
   final Value<String?> description;
+  final Value<bool> hidden;
   final Value<int?> sort;
+  final Value<BudgetData?> budgetData;
   const CategoriesCompanion({
     this.id = const Value.absent(),
     this.name = const Value.absent(),
     this.categoryGroupId = const Value.absent(),
     this.description = const Value.absent(),
+    this.hidden = const Value.absent(),
     this.sort = const Value.absent(),
+    this.budgetData = const Value.absent(),
   });
   CategoriesCompanion.insert({
     this.id = const Value.absent(),
     required String name,
     this.categoryGroupId = const Value.absent(),
     this.description = const Value.absent(),
+    this.hidden = const Value.absent(),
     this.sort = const Value.absent(),
+    this.budgetData = const Value.absent(),
   }) : name = Value(name);
   static Insertable<Category> custom({
     Expression<int>? id,
     Expression<String>? name,
     Expression<int>? categoryGroupId,
     Expression<String>? description,
+    Expression<bool>? hidden,
     Expression<int>? sort,
+    Expression<String>? budgetData,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (name != null) 'name': name,
       if (categoryGroupId != null) 'category_group_id': categoryGroupId,
       if (description != null) 'description': description,
+      if (hidden != null) 'hidden': hidden,
       if (sort != null) 'sort': sort,
+      if (budgetData != null) 'budget_data': budgetData,
     });
   }
 
@@ -802,13 +904,17 @@ class CategoriesCompanion extends UpdateCompanion<Category> {
       Value<String>? name,
       Value<int?>? categoryGroupId,
       Value<String?>? description,
-      Value<int?>? sort}) {
+      Value<bool>? hidden,
+      Value<int?>? sort,
+      Value<BudgetData?>? budgetData}) {
     return CategoriesCompanion(
       id: id ?? this.id,
       name: name ?? this.name,
       categoryGroupId: categoryGroupId ?? this.categoryGroupId,
       description: description ?? this.description,
+      hidden: hidden ?? this.hidden,
       sort: sort ?? this.sort,
+      budgetData: budgetData ?? this.budgetData,
     );
   }
 
@@ -827,8 +933,15 @@ class CategoriesCompanion extends UpdateCompanion<Category> {
     if (description.present) {
       map['description'] = Variable<String>(description.value);
     }
+    if (hidden.present) {
+      map['hidden'] = Variable<bool>(hidden.value);
+    }
     if (sort.present) {
       map['sort'] = Variable<int>(sort.value);
+    }
+    if (budgetData.present) {
+      final converter = Categories.$converterbudgetDatan;
+      map['budget_data'] = Variable<String>(converter.toSql(budgetData.value));
     }
     return map;
   }
@@ -840,7 +953,9 @@ class CategoriesCompanion extends UpdateCompanion<Category> {
           ..write('name: $name, ')
           ..write('categoryGroupId: $categoryGroupId, ')
           ..write('description: $description, ')
-          ..write('sort: $sort')
+          ..write('hidden: $hidden, ')
+          ..write('sort: $sort, ')
+          ..write('budgetData: $budgetData')
           ..write(')'))
         .toString();
   }
@@ -1172,8 +1287,9 @@ class BankTransactions extends Table
   late final GeneratedColumn<DateTime> date = GeneratedColumn<DateTime>(
       'date', aliasedName, false,
       type: DriftSqlType.dateTime,
-      requiredDuringInsert: true,
-      $customConstraints: 'NOT NULL');
+      requiredDuringInsert: false,
+      $customConstraints: 'NOT NULL DEFAULT CURRENT_TIMESTAMP',
+      defaultValue: const CustomExpression('CURRENT_TIMESTAMP'));
   static const VerificationMeta _descriptionMeta =
       const VerificationMeta('description');
   late final GeneratedColumn<String> description = GeneratedColumn<String>(
@@ -1211,8 +1327,6 @@ class BankTransactions extends Table
     if (data.containsKey('date')) {
       context.handle(
           _dateMeta, date.isAcceptableOrUnknown(data['date']!, _dateMeta));
-    } else if (isInserting) {
-      context.missing(_dateMeta);
     }
     if (data.containsKey('description')) {
       context.handle(
@@ -1369,11 +1483,10 @@ class BankTransactionsCompanion extends UpdateCompanion<BankTransaction> {
     this.id = const Value.absent(),
     required int accountId,
     required int amount,
-    required DateTime date,
+    this.date = const Value.absent(),
     this.description = const Value.absent(),
   })  : accountId = Value(accountId),
-        amount = Value(amount),
-        date = Value(date);
+        amount = Value(amount);
   static Insertable<BankTransaction> custom({
     Expression<int>? id,
     Expression<int>? accountId,
@@ -1711,6 +1824,8 @@ abstract class _$MainDatabase extends GeneratedDatabase {
   late final Categories categories = Categories(this);
   late final CategoryEnvelopes categoryEnvelopes = CategoryEnvelopes(this);
   late final BankTransactions bankTransactions = BankTransactions(this);
+  late final Index bankTransactionCreated = Index('bank_transaction_created',
+      'CREATE INDEX bank_transaction_created ON bank_transactions (date)');
   late final BankTransactionCategory bankTransactionCategory =
       BankTransactionCategory(this);
   late final Trigger categoryEnvelopeUpdated = Trigger(
@@ -1778,6 +1893,7 @@ abstract class _$MainDatabase extends GeneratedDatabase {
         categories,
         categoryEnvelopes,
         bankTransactions,
+        bankTransactionCreated,
         bankTransactionCategory,
         categoryEnvelopeUpdated,
         categoryEnvelopeBalanceUpdated,

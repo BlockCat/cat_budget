@@ -48,31 +48,41 @@ void main() {
         database.moneyInBank().watchSingle(),
         emitsInOrder([1000, 2000, 3000, 2000, 1000, 1500]));
 
-    await database.bankTransactions.insertOne(BankTransactionsCompanion.insert(
-        accountId: id,
-        amount: 1000,
-        description: const Value("description 1"),
-        date: DateTime.now()));
-    await database.bankTransactions.insertOne(BankTransactionsCompanion.insert(
-        accountId: id,
-        amount: 1000,
-        description: const Value("description 2"),
-        date: DateTime.now()));
-    await database.bankTransactions.insertOne(BankTransactionsCompanion.insert(
-        accountId: id,
-        amount: -1000,
-        description: const Value("description 2"),
-        date: DateTime.now()));
-    await database.bankTransactions.insertOne(BankTransactionsCompanion.insert(
-        accountId: id,
-        amount: -1000,
-        description: const Value("description 2"),
-        date: DateTime.now()));
-    await database.bankTransactions.insertOne(BankTransactionsCompanion.insert(
-        accountId: id,
-        amount: 500,
-        description: const Value("description 2"),
-        date: DateTime.now()));
+    await database.bankTransactions.insertOne(
+      BankTransactionsCompanion.insert(
+          accountId: id,
+          amount: 1000,
+          description: const Value("description 1"),
+          date: Value(DateTime.now())),
+    );
+    await database.bankTransactions.insertOne(
+      BankTransactionsCompanion.insert(
+          accountId: id,
+          amount: 1000,
+          description: const Value("description 2"),
+          date: Value(DateTime.now())),
+    );
+    await database.bankTransactions.insertOne(
+      BankTransactionsCompanion.insert(
+          accountId: id,
+          amount: -1000,
+          description: const Value("description 2"),
+          date: Value(DateTime.now())),
+    );
+    await database.bankTransactions.insertOne(
+      BankTransactionsCompanion.insert(
+          accountId: id,
+          amount: -1000,
+          description: const Value("description 2"),
+          date: Value(DateTime.now())),
+    );
+    await database.bankTransactions.insertOne(
+      BankTransactionsCompanion.insert(
+          accountId: id,
+          amount: 500,
+          description: const Value("description 2"),
+          date: Value(DateTime.now())),
+    );
 
     await expectAccountBalance;
   });
